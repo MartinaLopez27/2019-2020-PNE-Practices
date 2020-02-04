@@ -1,2 +1,2 @@
 for index in range (1, 21):
-    print(index, end=' ')
+    print(index, end=' ') i = 1
