@@ -10,4 +10,8 @@ def Fibonacci(num):
     else:
         return Fibonacci(num - 1) + Fibonacci(num - 2)
 
-print(Fibonacci(11))
+sum = 0
+for i in range(1, 6):
+    sum = Fibonacci(i) + sum
+
+print(sum)
