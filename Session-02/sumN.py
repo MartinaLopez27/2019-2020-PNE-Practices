@@ -1,4 +1,4 @@
-#Function for calculating the sum of the N first integer numbers
+# Function for calculating the sum of the N first integer numbers
 
 def sumn(n):
     res = 0
