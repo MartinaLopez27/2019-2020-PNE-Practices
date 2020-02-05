@@ -6,3 +6,4 @@ print("First exercise of my own")
 # Exercise S1-1
 print("Another print added!")
 print("just testing...")
+print("H")
