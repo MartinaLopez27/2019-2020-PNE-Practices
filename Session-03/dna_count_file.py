@@ -7,7 +7,6 @@ counter_G = 0
 counter = 0
 
 with open('dna.txt', 'r') as f:
-    f = f.strip
     for line in f:
         for character in line:
             counter = counter + 1
