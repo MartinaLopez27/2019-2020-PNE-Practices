@@ -12,3 +12,4 @@ for element in filename:
         print(gene)
         for letter in bases:
             count = seq_count_base(seq, bases)
+
