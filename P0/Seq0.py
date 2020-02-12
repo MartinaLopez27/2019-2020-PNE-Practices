@@ -10,4 +10,6 @@ def seq_read_fasta(filename):
     body = "".join(file[1:])
     return(body)
 
-#def seq_len(seq)
+
+def seq_len(seq):
+    return(len(seq))
