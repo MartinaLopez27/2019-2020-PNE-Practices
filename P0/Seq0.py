@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 def seq_ping():
     print("OK!")
 
@@ -14,7 +15,8 @@ def seq_read_fasta(filename):
 def seq_len(seq):
     return(len(seq))
 
-def  seq_count_base(seq, base):
+
+def seq_count_base(seq, base):
     counter_A = 0
     counter_C = 0
     counter_T = 0
@@ -37,6 +39,7 @@ def  seq_count_base(seq, base):
 
 
 #def seq_count(seq):
+
 
 def seq_reverse(seq):
     return seq[::-1]
