@@ -8,5 +8,6 @@ print("------| Exercise 6 |------")
 
 print("Gene", gene)
 seq = seq_read_fasta(FOLDER + filename)
+
 print("Frag: ", seq[0:20])
 print("Rev: ", seq_reverse(seq[0:20]))
