@@ -7,6 +7,8 @@ list_genes = ["U5", "ADA", "FRAT1", "FXN", "RNU6_269P"]
 
 print("-----| Exercise 3 |------")
 
+counter = 0
 for element in filename:
     seq = seq_read_fasta(FOLDER + element)
-    print("Gene", element, "---> Length: ", seq_len(seq))
+    print("Gene", list_genes[counter], "---> Length: ", seq_len(seq))
+    counter += 1

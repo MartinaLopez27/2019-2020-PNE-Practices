@@ -41,3 +41,7 @@ def  seq_count_base(seq, base):
 def seq_reverse(seq):
     return seq[::-1]
 
+
+#def seq_complement(seq):
+ #   d = {'A': T, 'T': A, 'C': G, 'G': C}
+
