@@ -34,3 +34,10 @@ def  seq_count_base(seq, base):
     print("C: ", counter_C)
     print("T: ", counter_T)
     print("G: ", counter_G)
+
+
+#def seq_count(seq):
+
+def seq_reverse(seq):
+    return seq[::-1]
+
