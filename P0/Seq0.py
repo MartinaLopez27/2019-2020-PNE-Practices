@@ -36,4 +36,3 @@ def seq_complement(seq):
     for base in seq:
         str += dictionary[base]
     return str
-
