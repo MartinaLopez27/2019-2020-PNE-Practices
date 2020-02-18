@@ -46,6 +46,10 @@ def seq_reverse(seq):
     return seq[::-1]
 
 
-#def seq_complement(seq):
- #   d = {'A': T, 'T': A, 'C': G, 'G': C}
+def seq_complement(seq):
+    dictionary = {'A': "T", 'T': "A", 'C': "G", 'G': "C"}
+    for key in dictionary.keys():
+        seq = seq.replace(key, dictionary[key])
+    return seq
+
 
