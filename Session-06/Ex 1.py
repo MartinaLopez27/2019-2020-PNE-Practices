@@ -4,8 +4,8 @@ class Seq:
 
         bases = ['A', 'C', 'G', 'T']
 
-        for b in strbases:
-            if b not in bases:
+        for base in strbases:
+            if base not in bases:
                 print("ERROR!!")
                 self.strbases = "ERROR"
                 return
