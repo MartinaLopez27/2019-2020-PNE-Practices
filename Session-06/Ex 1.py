@@ -1,6 +1,15 @@
 class Seq:
 
     def __init__(self, strbases):
+
+        bases = ['A', 'C', 'G', 'T']
+
+        for b in strbases:
+            if b not in bases:
+                print("ERROR!!")
+                self.strbases = "ERROR"
+                return
+
         self.strbases = strbases
 
         print("New sequence created!")
