@@ -15,4 +15,3 @@ for element in filename:
     counter += 1
     for base in bases:
         print(f"  {base}: {seq_count_base(seq, base)}")
-
