@@ -52,4 +52,3 @@ def seq_complement(seq):
         seq = seq.replace(key, dictionary[key])
     return seq
 
-
