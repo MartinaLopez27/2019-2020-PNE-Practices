@@ -38,7 +38,8 @@ def seq_count_base(seq, base):
     print("G: ", counter_G)
 
 
-#def seq_count(seq):
+def seq_count(seq):
+    d = seq_count_base(seq, base)
 
 
 def seq_reverse(seq):
