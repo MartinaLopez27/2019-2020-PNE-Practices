@@ -6,9 +6,6 @@ base = ["A", "C", "T", "G"]
 
 print("-----| Exercise 5 |------")
 
-d = {'A': 0, 'T': 0, 'C': 0, 'G': 0}
-
 for element in filename:
     seq = seq_read_fasta(FOLDER + element)
-    print(d['A'], d['T'], d['C'], d['G'])
-    seq_count(seq)
+    print(f"Gene {element}: {seq_count(seq)}")
