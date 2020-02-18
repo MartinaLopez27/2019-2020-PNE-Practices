@@ -32,7 +32,8 @@ def seq_reverse(seq):
 
 def seq_complement(seq):
     dictionary = {'A': "T", 'T': "A", 'C': "G", 'G': "C"}
-    for key in dictionary.keys():
-        seq = seq.replace(key, dictionary[key])
-    return seq
+    str = ""
+    for base in seq:
+        str += dictionary[base]
+    return str
 
