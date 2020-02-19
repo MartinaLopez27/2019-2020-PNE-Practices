@@ -78,3 +78,4 @@ class Seq:
         body = contents.split('\n')[1:]
         self.strbases = "".join(body)
         return self
+
