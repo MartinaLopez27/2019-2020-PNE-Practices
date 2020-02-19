@@ -1,3 +1,5 @@
+from pathlib import Path
+
 class Seq:
     """A class for representing sequences"""
 
