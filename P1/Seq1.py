@@ -32,7 +32,10 @@ class Seq:
 
     def len(self):
         """Calculate the length of the sequence"""
-        return len(self.strbases)
+        if self.strbases in [self.NULL, self.ERROR]:
+            return 0
+        else:
+            return len(self.strbases)
 
     def valid_str(self, strbases):
         valid_bases = ['A', 'C', 'T', 'G']
@@ -43,5 +46,5 @@ class Seq:
 
         return True
 
-    def seq_count_base(seq, base):
-        return seq.count(base)
+    def count_base(self, base):
+        return self.strbases.count(base)

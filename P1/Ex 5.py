@@ -1,7 +1,8 @@
 from Seq1 import Seq
 
+Practice = 1
 Exercise = 5
-print(f"------| Exercise {Exercise} |------")
+print(f"------| Practice {Practice}, Exercise {Exercise} |------")
 
 # -- Creating a Null sequence
 s0 = Seq()
@@ -10,7 +11,8 @@ s1 = Seq("ACTGA")
 # -- Create an invalid sequence
 s2 = Seq("Invalid sequence")
 
-print(f"Sequence 0: (Length: {s1.len()}) {s0}")
-print(f"A {s0.count_base()} {s0}")
-print(f"Sequence 1: (Length: {s1.len()}) {s1}")
-print(f"Sequence 2: (Length: {s1.len()}) {s2}")
+for num, l in enumerate([s0, s1, s2]):
+    print(f"Sequence {num}: (Length: {l.len()}) {l}")
+    for base in ['A', 'C', 'T', 'G']:
+        print(f"  {base}: {l.count_base(base)}", end=", ")
+    print()
