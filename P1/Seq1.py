@@ -19,15 +19,3 @@ class Seq:
     def len(self):
         """Calculate the length of the sequence"""
         return len(self.strbases)
-
-
-class Gene(Seq):
-    pass
-
-# --- Main program
-s1 = Seq("AGTACACTGGT")
-g = Gene("CGTAAC")
-
-# -- Printing the objects
-print(f"Sequence 1: {s1}")
-print(f"Gene: {g}")
