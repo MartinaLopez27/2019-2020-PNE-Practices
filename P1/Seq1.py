@@ -3,11 +3,24 @@ from pathlib import Path
 class Seq:
     """A class for representing sequences"""
 
-    def __init__(self, strbases):
-        # Initialize the sequence with the value
-        # passed as argument when creating the object
-        self.strbases = strbases
+    NULL = "NULL"  #empty
+    ERROR = "ERROR"  #invalid
 
+    def __init__(self, strbases = "NULL"):
+
+        #It is a NULL sequence (empty)?
+        if strbases.self == self.NULL:
+            self.strbases = self.NULL
+            print("NULL Seq created")
+            return
+
+        #It is a valid sequence?
+        if strbases.self != self.NULL:
+            self.strbases = self.ERROR
+            print("INVALID Seq!")
+            return
+
+        self.strbases = strbases
         print("New sequence created!")
 
     def __str__(self):
