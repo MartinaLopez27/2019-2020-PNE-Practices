@@ -72,3 +72,9 @@ class Seq:
             dic += basescom[base]
 
         return dic
+
+    def read_fasta(self, filename):
+        contents = Path(filename).read_text()
+        body = contents.split('\n')[1:]
+        self.strbases = "".join(body)
+        return self
