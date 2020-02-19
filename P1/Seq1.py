@@ -59,3 +59,16 @@ class Seq:
             return self.strbases
         else:
             return self.strbases[::-1]
+
+    def complement(self):
+        if self.strbases in [self.NULL, self.ERROR]:
+            return self.strbases
+
+        basescom = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
+
+        dic = ""
+
+        for base in self.strbases:
+            dic += basescom[base]
+
+        return dic
