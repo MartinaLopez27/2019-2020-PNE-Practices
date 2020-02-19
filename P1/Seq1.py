@@ -5,17 +5,18 @@ class Seq:
 
     NULL = "NULL"  #empty
     ERROR = "ERROR"  #invalid
+    VALID = "VALID"  #valid
 
     def __init__(self, strbases = "NULL"):
 
         #It is a NULL sequence (empty)?
-        if strbases.self == self.NULL:
+        if strbases == self.NULL:
             self.strbases = self.NULL
             print("NULL Seq created")
             return
 
-        #It is a valid sequence?
-        if strbases.self != self.NULL:
+        # It is a invalid sequence?
+        if not self.valid_str(strbases):
             self.strbases = self.ERROR
             print("INVALID Seq!")
             return
