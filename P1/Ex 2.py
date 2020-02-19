@@ -1,7 +1,8 @@
 from Seq1 import Seq
 
+Practice = 1
 Exercise = 2
-print(f"------| Exercise {Exercise} |------")
+print(f"------| Practice {Practice}, Exercise {Exercise} |------")
 
 # -- Creating a Null sequence
 s1 = Seq()
