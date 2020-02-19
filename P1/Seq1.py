@@ -42,3 +42,6 @@ class Seq:
                 return False
 
         return True
+
+    def seq_count_base(seq, base):
+        return seq.count(base)
