@@ -22,7 +22,6 @@ class Seq:
 class Gene(Seq):
     pass
 
-
 # --- Main program
 s1 = Seq("AGTACACTGGT")
 g = Gene("CGTAAC")
