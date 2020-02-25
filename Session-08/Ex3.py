@@ -1,5 +1,8 @@
 import socket
 
+Exercise = 3
+print(f"------| Exercise {Exercise} |------")
+
 # SERVER IP, PORT
 PORT = 8080
 IP = "212.128.253.145"
