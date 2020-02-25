@@ -37,3 +37,10 @@ try:
         # We must write bytes, not a string
         clientsocket.send(send_bytes)
         clientsocket.close()
+
+except socket.error:
+    print("Problems using port {}. Do you have permission?".format(PORT))
+
+except KeyboardInterrupt:
+    print("Server stopped by the user")
+    serversocket.close()
