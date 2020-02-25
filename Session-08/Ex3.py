@@ -4,7 +4,7 @@ Exercise = 3
 print(f"------| Exercise {Exercise} |------")
 
 # SERVER IP, PORT
-PORT = 8080
+PORT = 8082
 IP = "212.128.253.145"
 
 while True:
