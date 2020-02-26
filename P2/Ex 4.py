@@ -15,6 +15,6 @@ c = Client(IP, PORT)
 # -- And print it
 print(c)
 
-# -- Send a message to the server
+# -- The message to the server
 c.debug_talk("Message 1---")
 c.debug_talk("Message 2: Testing !!!")
