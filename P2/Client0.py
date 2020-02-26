@@ -22,8 +22,6 @@ class Client:
         return msg_from_server
 
     def talk(self, msg):
-        """Sent the string (message) to the app running in the given IP and Port"""
-
         # -- Create the socket
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
