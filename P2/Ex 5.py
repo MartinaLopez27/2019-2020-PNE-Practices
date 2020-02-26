@@ -10,7 +10,7 @@ folder = "../Session-04/"
 ext = ".txt"
 gene = "U5"
 
-IP = "212.128.253.145"
+IP = "192.168.1.136"
 PORT = 8080
 
 # -- Create a client object
