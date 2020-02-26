@@ -19,6 +19,7 @@ print(c)
 
 file = Seq().read_fasta(folder + gene + ext)
 bases = str(file)
+
 length = 10
 
 print(f"Gene {gene}: {bases}")

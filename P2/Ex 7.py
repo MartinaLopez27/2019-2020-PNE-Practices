@@ -6,56 +6,46 @@ EXERCISE = 7
 
 print(f"-----| Practice {PRACTICE}, Exercise {EXERCISE} |------")
 
-# -- Parameters of the server to talk to
-IP = "192.168.1.45"
+folder = "../Session-04/"
+ext = ".txt"
+gene = "FRAT1"
+
+IP = "192.168.1.136"
 PORT = 8080
 
-FOLDER = "../Session-04/"
-EXT = ".txt"
-GENE = "FRAT1"
 
-# -- Create the client objects for connecting to the servers
 c1 = Client(IP, PORT)
 c2 = Client(IP, PORT + 1)
 
-# -- Print the IP and PORTs
 print(c1)
 print(c2)
 
-# -- Read the Gene from a file
-s = Seq().read_fasta(FOLDER + GENE + EXT)
 
-# -- Get the gene string
-bases = str(s)
+file = Seq().read_fasta(folder + gene + ext)
+bases = str(file)
 
-# -- Print the Gene on the console
-print(f"Gene {GENE}: {bases}")
+length = 10
 
-# -- Length of fragments
-LENGTH = 10
+print(f"Gene {gene}: {bases}")
 
-# -- Send the initial message to both servers
-init_msg = f"Sending {GENE} Gene to the server, in fragments of {LENGTH} bases..."
 
-c1.talk(init_msg)
-c2.talk(init_msg)
+msg = f"Sending {gene} Gene to the server, in fragments of {length} bases..."
 
-# -- Create the framents and sent them to the servers
-for i in range(10):
+c1.talk(msg)
+c2.talk(msg)
 
-    # -- Create fragment i
-    frag = bases[i*LENGTH:(i+1)*LENGTH]
 
-    # -- Print on Client's console
-    print(f"Fragment {i+1}: {frag}")
+for index in range(10):
+    frag = bases[index * length : (index + 1) * length]
 
-    # -- Message to send to the server
-    msg = f"Fragment {i+1}: {frag}"
+    # Client's console
+    print(f"Fragment {index + 1}: {frag}")
 
-    # -- even fragments (counting from 0) are sent to server 1
-    if i % 2:
-        c2.talk(msg)
+    # Send to the server
+    msg_2 = f"Fragment {index + 1}: {frag}"
 
-    # -- Odd segments are sent to server 2
+    if index % 2:
+        c2.talk(msg_2)
+
     else:
-        c1.talk(msg)
+        c1.talk(msg_2)
