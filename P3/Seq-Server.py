@@ -2,8 +2,8 @@ import socket
 import termcolor
 from Seq1 import Seq
 
-PORT = 8080
 IP = "127.0.0.1"
+PORT = 8080
 
 FOLDER = "../Session-04/"
 GENES = ["U5", "ADA", "FRAT1", "FXN", "RNU6_269P"]
@@ -15,8 +15,7 @@ Seq_test = [
     "AAAAACATTAATC",
     "CAAGGTCCCCTTC",
     "CCCTAGCCTGACT",
-    "AGCGCAAACGCTA",
-]
+    "AGCGCAAACGCTA",]
 
 
 def get_cmd(n):
@@ -24,10 +23,6 @@ def get_cmd(n):
 
 
 def info_cmd(strseq):
-    """INFO seq
-    returns: The string with the information
-    """
-    # -- Create the object sequence from the string
     s = Seq(strseq)
     sl = s.len()
     ca = s.count_base('A')
@@ -46,6 +41,7 @@ C: {cc} ({pc}%)
 G: {cg} ({pg}%)
 T: {ct} ({pt}%)"""
     return resp
+
 
 def comp_cmd(strseq):
     s = Seq(strseq)
@@ -70,6 +66,7 @@ ls.bind((IP, PORT))
 ls.listen()
 print("SEQ Server configured!")
 
+#Main program
 while True:
     print("Waiting for clients....")
 
@@ -89,7 +86,6 @@ while True:
 
         lcmds = line0.split(' ')
 
-        # -- The first element is the command
         cmd = lcmds[0]
 
         response = ""
