@@ -1,0 +1,10 @@
+Request line: GET /hello HTTP/1.1
+Path: hello HTTP
+
+Request line: GET /file.html HTTP/1.1
+Path: file.html HTTP
+
+Request line: GET /hi/there?name=virus&type=corona HTTP/1.1
+Path: hi/there?name=virus&type=corona HTTP
+
+http://192.168.1.138:8080/dna/u5
