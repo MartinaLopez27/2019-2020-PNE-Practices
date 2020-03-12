@@ -2,8 +2,6 @@ import socket
 import termcolor
 
 
-# http://192.168.1.138:8080/
-
 # -- Server network parameters
 IP = "192.168.1.138"
 PORT = 8080
