@@ -19,45 +19,32 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         """This method is called whenever the client invokes the GET method
         in the HTTP protocol request"""
 
+        # Print the request line
         termcolor.cprint(self.requestline, 'green')
         req_line = self.requestline.split(' ')
 
-        path = req_line[1] #index where we start
+
+        path = req_line[1]
         path = path[1:]
 
-        contents = ""
-        status = 0
         content_type = 'text/html'
 
         if path == "":
             path = "index.html"
 
-        elif path =="index.html":
-            termcolor.cprint("Main page requested", 'blue')
 
-            # IN this simple server version:
-            # We are NOT processing the client's request
-            # It is a happy server: It always returns a message saying
-            # that everything is ok
-
-            # Message to send back to the client
+        try:
             contents = Path(path).read_text()
-
-            #Status code found
             status = 200
 
-        else:
-            # NOT FOUND
-            termcolor.cprint("ERROR: Not found", 'red')
-
-            # Message to send back to the client
+        except FileNotFoundError:
             contents = Path("Error.html").read_text()
 
-            # Status code is NOT FOUND
+            # Status not found
             status = 404
 
         # Generating the response message
-        self.send_response(status)  # -- Status line
+        self.send_response(status)
 
         # Define the content-type header:
         self.send_header('Content-Type', content_type)
