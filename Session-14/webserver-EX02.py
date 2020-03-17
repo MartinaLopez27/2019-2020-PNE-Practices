@@ -25,6 +25,8 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         path = req_line[1] #index where we start
         path = path[1:]
 
+        contents = ""
+        status = 0
         content_type = 'text/html'
 
         if path == "":
