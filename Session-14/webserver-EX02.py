@@ -3,7 +3,6 @@ import socketserver
 import termcolor
 from pathlib import Path
 
-
 # Define the Server's port
 PORT = 8080
 
