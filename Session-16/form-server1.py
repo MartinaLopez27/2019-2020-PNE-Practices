@@ -41,7 +41,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
         return
 
-
 # ------------------------
 # - Server MAIN program
 # ------------------------
