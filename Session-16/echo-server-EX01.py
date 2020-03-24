@@ -34,7 +34,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         #Read the first thing of the text
         header = text[0]
 
-
         # Open the form1.html file
         # Read the index from the file
         contents = Path('Error.html').read_text()
