@@ -23,7 +23,7 @@ SERVER = 'rest.ensembl.org'
 ENDPOINT = '/sequence/id/'
 PARAMETERS = '?content-type=application/json'
 
-# -- Ask the user to enter the gene name
+# Ask the user to enter the gene name
 print()
 gene_user = input("Write the gene name: ")
 
@@ -44,17 +44,17 @@ except ConnectionRefusedError:
     print("ERROR! Cannot connect to the Server")
     exit()
 
-# -- Read the response message from the server
+# Read the response message from the server
 r1 = conn.getresponse()
 
-# -- Print the status line
+# Print the status line
 print(f"Response received!: {r1.status} {r1.reason}\n")
 
-# -- Read the response's body
+# -Read the response's body
 data1 = r1.read().decode()
 
-# -- Create a variable with the data,
-# -- form the JSON received
+# Create a variable with the data,
+# form the JSON received
 gene = json.loads(data1)
 
 termcolor.cprint("Gene", 'green', end="")
@@ -64,7 +64,7 @@ print(f": {gene['desc']}")
 
 gene_str = gene['seq']
 
-# -- Create the object sequence from the string
+# Create the object sequence from the string
 s = Seq(gene_str)
 
 sl = s.len()
@@ -89,15 +89,15 @@ print(f": {cg} ({pg}%)")
 termcolor.cprint("T", 'blue', end="")
 print(f": {ct} ({pt}%)")
 
-# -- Dictionary with the values
+# Dictionary with the values
 d = s.count()
 
-# -- Create a list with all the values
+# Create a list with all the values
 ll = list(d.values())
 
-# -- Calculate the maximum
+# Calculate the maximum
 m = max(ll)
 
-# -- Print the base
+# Print the base
 termcolor.cprint("Most frequent Base", 'green', end="")
 print(f": {BASES[ll.index(m)]}")
