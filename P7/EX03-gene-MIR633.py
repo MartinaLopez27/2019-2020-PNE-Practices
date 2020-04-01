@@ -36,17 +36,17 @@ except ConnectionRefusedError:
     print("ERROR! Cannot connect to the Server")
     exit()
 
-# -- Read the response message from the server
+# Read the response message from the server
 r1 = conn.getresponse()
 
-# -- Print the status line
+# Print the status line
 print(f"Response received!: {r1.status} {r1.reason}\n")
 
-# -- Read the response's body
+# Read the response's body
 data1 = r1.read().decode()
 
-# -- Create a variable with the data,
-# -- form the JSON received
+# Create a variable with the data,
+# form the JSON received
 gene = json.loads(data1)
 
 termcolor.cprint("Gene", 'green', end="")
