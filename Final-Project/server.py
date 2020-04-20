@@ -3,7 +3,9 @@ import socketserver
 import termcolor
 import json
 import http.client
-from Seq import Seq
+from pathlib import Path
+
+#from Seq import Seq
 
 # Define the Server's port
 PORT = 8000
@@ -12,6 +14,7 @@ PORT = 8000
 # Class with our Handler. It is a called derived from BaseHTTPRequestHandler
 # It means that our class inheritates all his methods and properties
 class TestHandler(http.server.BaseHTTPRequestHandler):
+
     def dictionary_split(self, path):
         dictionary = dict()
         if '?' in self.path:
@@ -206,15 +209,16 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
             return
 
-    # ------------------------
-    # - Server MAIN program
-    # ------------------------
-    # -- Set the new handler
-    Handler = TestHandler
-    socketserver.TCPServer.allow_reuse_address = True
+# ------------------------
+# - Server MAIN program
+# ------------------------
+# -- Set the new handler
+Handler = TestHandler
+socketserver.TCPServer.allow_reuse_address = True
 
-    # -- Open the socket server
-    with socketserver.TCPServer(("", PORT), Handler) as httpd:
+# -- Open the socket server
+with socketserver.TCPServer(("", PORT), Handler) as httpd:
+
     print("Serving at PORT", PORT)
 
     # -- Main loop: Attend the client. Whenever there is a new
