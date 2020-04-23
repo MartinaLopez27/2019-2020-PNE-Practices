@@ -6,6 +6,7 @@ SERVER = 'localhost'
 
 print("\nConnecting to server: {}:{}\n".format(SERVER, PORT))
 
+# Connect with the server
 conn = http.client.HTTPConnection(SERVER, PORT)
 
 # -- 1 TRY FOR JSON

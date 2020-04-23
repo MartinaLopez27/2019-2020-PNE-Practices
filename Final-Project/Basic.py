@@ -1,13 +1,15 @@
 import http.server
 import socketserver
 import termcolor
-import json
-import http.client
-
+from pathlib import Path
+from Seq1 import Seq
 
 # Define the Server's port
-PORT = 8000
+PORT = 8080
 
+
+# -- This is for preventing the error: "Port already in use"
+socketserver.TCPServer.allow_reuse_address = True
 
 # Class with our Handler. It is a called derived from BaseHTTPRequestHandler
 # It means that our class inheritates all his methods and properties
@@ -20,174 +22,62 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         # Print the request line
         termcolor.cprint(self.requestline, 'green')
 
+        # Analize the request line
+        req_line = self.requestline.split(' ')
 
-        # Message to send back to the client
-        # We first program the code of the main page that will give the user back the index
-        if self.path == '/' or self.path == '/index.html':
-            filename = 'index.html'
-            with open(filename, 'r') as f:
-                contents = f.read()
-        elif '/listSpecies' in self.path:
-            try:
-                if 'limit=' in self.path:
-                    limit = self.path.split('limit=')[1]
-                    print(limit)
-                    conn = http.client.HTTPConnection('rest.ensembl.org')
-                    conn.request("GET", "/info/species?content-type=application/json")
-                    # -- Wait for the server's response
-                    r1 = conn.getresponse()
-                    # -- Print the status
-                    print()
-                    print("Response received: ", end='')
-                    print(r1.status, r1.reason)
-                    # -- Read the response's body and close
-                    # -- the connection
-                    text_json = r1.read().decode("utf-8")
-                    resp = json.loads(text_json)
-                    species_l = resp['species']
-                    conn.close()
-                    contents = """<html> <body style="background-color: D7B7BC;"><FONT FACE="monospace" SIZE = 5 
-                    COLOR = 'white'><h3>List of the chosen limited species </h3></FONT> <ol> """
-                    limit = int(limit)
-                    counter = 0
-                    for specie in species_l:
-                        contents = contents + "<li>" + specie['display_name'] + "</li>"
-                        counter = counter + 1
-                        if counter == limit:
-                            break
-                    contents = contents + """</ol>
-                            </body>
-                            </html>
-                            """
+        # Get the path. It always start with the / symbol
+        path = req_line[1]
 
+        # Read the arguments
+        arguments = path.split('?')
 
-                else:
-                    conn = http.client.HTTPConnection('rest.ensembl.org')
-                    conn.request("GET", "/info/species?content-type=application/json")
-                    # -- Wait for the server's response
-                    r1 = conn.getresponse()
-                    # -- Print the status
-                    print()
-                    print("Response received: ", end='')
-                    print(r1.status, r1.reason)
-                    # -- Read the response's body and close
-                    # -- the connection
-                    text_json = r1.read().decode("utf-8")
-                    resp = json.loads(text_json)
-                    species_l = resp['species']
-                    contents = """<html> <body style="background-color: D7B7BC;"><FONT FACE="monospace" SIZE = 5 
-                    COLOR = 'white'><h3>List of all the species </h3></FONT> <ol> """
+        # Get the verb. It is the first argument
+        verb = arguments[0]
 
-                    for specie in species_l:
-                        contents = contents + "<li>" + specie['display_name'] + "</li>"
+        # -- Content type header
+        # -- Both, the error and the main page are in HTML
+        contents = Path('Error.html').read_text()
+        error_code = 404
 
-                    contents = contents + """</ol>
-                                            </body>
-                                            </html>
-                                            """
-            except ValueError:
-                filename = 'error.html'
-                with open(filename, 'r') as f:
-                    contents = f.read()
-            except KeyError:
-                filename = 'error.html'
-                with open(filename, 'r') as f:
-                    contents = f.read()
-            except TypeError:
-                filename = 'error.html'
-                with open(filename, 'r') as f:
-                    contents = f.read()
-        elif '/karyotype' in self.path:
-            try:
-                specie = self.path.split('=')[1]
-                conn = http.client.HTTPConnection('rest.ensembl.org')
-                conn.request("GET", "/info/assembly/" + specie + "?content-type=application/json")
-                r1 = conn.getresponse()
-                print()
-                print("Response received: ", end='')
-                print(r1.status, r1.reason)
-                text_json = r1.read().decode("utf-8")
-                resp = json.loads(text_json)
-                karyotype_l = resp['karyotype']
-                print(karyotype_l)
-                contents = """<html> <body style="background-color: D7B7BC;"><FONT FACE="monospace" SIZE = 5 COLOR = 
-                'white'><h3>Chromosomes of the chosen specie: </h3></FONT> <ul> """
+        if verb == "/":
+            # Open the form1.html file
+            # Read the index from the file
+            contents = Path('basic index.html').read_text()
+            error_code = 200
 
-                for elem in karyotype_l:
-                    contents = contents + "<li>" + elem + "</li>"
+        elif verb == "/listSpecies":
+            conn = http.client.HTTPConnection('rest.ensembl.org')
+            conn.request("GET", "/info/species?content-type=application/json")
+            r1 = conn.getresponse()
 
-                contents = contents + """</ul>
-                                                        </body>
-                                                        </html>
-                                                           """
-            except KeyError:
-                filename = 'error.html'
-                with open(filename, 'r') as f:
-                    contents = f.read()
+            # -- Print the status
+            print()
+            print("Response received: ", end='')
+            print(r1.status, r1.reason)
 
-            except IndexError:
-                filename = 'error.html'
-                with open(filename, 'r') as f:
-                    contents = f.read()
+            # -- Generate the html code
+            contents = """
+                              <html>
+                              <body style ="background-color: salmon;">
+                              <ul> """
 
-            except TypeError:
-                filename = 'error.html'
-                with open(filename, 'r') as f:
-                    contents = f.read()
+            cont = 0
+            for specie in species:
+                contents = contents + "<li>" + specie['display_name'] + "</li>"
+                cont = cont + 1
+                print(cont, limit)
+                if (cont == limit):
+                    break
 
+            contents = contents + """<ul>
+                                              <body>
+                                              <html>
+                                              """
 
-        elif '/chromosomeLength' in self.path:
-            try:
-                slice = self.path.split('&')[1]
-                chromo = slice.split('=')[1]
-                slice2 = self.path.split('&')[0]
-                specie = slice2.split('=')[1]
-                print("The chromosome number to study its length is: ", chromo)
-                print("The specie to study is: ", specie)
-                conn = http.client.HTTPConnection('rest.ensembl.org')
-                conn.request("GET", "/info/assembly/" + specie + "?content-type=application/json")
-                r1 = conn.getresponse()
-                print()
-                print("Response received: ", end='')
-                print(r1.status, r1.reason)
-                text_json = r1.read().decode("utf-8")
-                resp = json.loads(text_json)
-                info = resp['top_level_region']
-                length = 0
-                for elem in info:
-                    if elem['name'] == chromo:
-                        length = str(elem['length'])
-                print(length)
-                contents = """<html> <body style="background-color: D7B7BC;"><FONT FACE="monospace" SIZE = 5 COLOR = 
-                'white'><h3>The length of the chromosome of the chosen specie is: </h3></FONT> <ul> """
-
-                contents = contents + "<li>" + length + "</li>"
-
-                """</ul>
-                                                                    </body>
-                                                                    </html>
-                                                                    """
-            except KeyError:
-                filename = 'error.html'
-                with open(filename, 'r') as f:
-                    contents = f.read()
-            except ValueError:
-                filename = 'error.html'
-                with open(filename, 'r') as f:
-                    contents = f.read()
-            except TypeError:
-                filename = 'error.html'
-                with open(filename, 'r') as f:
-                    contents = f.read()
-
-
-        else:
-            filename = 'error.html'
-            with open(filename, 'r') as f:
-                contents = f.read()
+            error_code = 200
 
         # Generating the response message
-        self.send_response(200)  # -- Status line: OK!
+        self.send_response(error_code)  # -- Status line: OK!
 
         # Define the content-type header:
         self.send_header('Content-Type', 'text/html')
@@ -201,16 +91,15 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
         return
 
-
 # ------------------------
-# - Below we have the server MAIN program
+# - Server MAIN program
 # ------------------------
 # -- Set the new handler
 Handler = TestHandler
-socketserver.TCPServer.allow_reuse_address = True
 
 # -- Open the socket server
 with socketserver.TCPServer(("", PORT), Handler) as httpd:
+
     print("Serving at PORT", PORT)
 
     # -- Main loop: Attend the client. Whenever there is a new
@@ -219,8 +108,5 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
         httpd.serve_forever()
     except KeyboardInterrupt:
         print("")
-        print("Stoped by the user")
+        print("Stopped by the user")
         httpd.server_close()
-
-print("")
-print("Server Stopped")
