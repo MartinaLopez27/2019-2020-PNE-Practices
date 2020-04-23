@@ -1,11 +1,10 @@
-import http.server
-import socketserver
-import termcolor
-import json
 import http.client
-from pathlib import Path
+import http.server
+import json
+import socketserver
 
-#from Seq import Seq
+import termcolor
+from Seq import Seq
 
 # Define the Server's port
 PORT = 8000
