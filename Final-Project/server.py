@@ -4,7 +4,8 @@ import json
 import socketserver
 
 import termcolor
-#from Seq import Seq
+
+# from Seq import Seq
 
 # Define the Server's port
 PORT = 8000
@@ -25,8 +26,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                     key = pair.split("=")[0]
                     value = pair.split("=")[1]
                     dictionary[key] = value
-        return (dictionary)
-
+        return dictionary
 
     def do_GET(self):
         response_code = 200
@@ -48,7 +48,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             with open("index.html", "r") as f:
                 contents = f.read()
         # -- Here we read the index.html code.
-
 
         elif "listSpecies" in self.path:
             dicc = self.dictionary_split(self.path)
@@ -97,19 +96,18 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                     contents = contents + "<li>" + specie['display_name'] + "</li>"
                     count = count + 1
                     print(count, limit)
-                    if (count == limit):
+                    if count == limit:
                         break
-
                 contents = contents + """<ul>
                                            <body>
                                            <html>
                                            """
-
             conn.close()
 
 
         elif "karyotype" in self.path:
             dicc = self.dictionary_split(self.path)
+
             if 'specie' in dicc and dicc['specie'] != '':
                 specie = dicc['specie']
                 conn = http.client.HTTPConnection('rest.ensembl.org')
@@ -118,6 +116,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 text_json = result.read().decode("utf-8")
                 response = json.loads(text_json)
                 print(response)
+
                 if 'karyotype' in response:
                     list_chromosome = response['karyotype']
                     if 'json' in dicc and dicc['json'] == '1':
@@ -149,6 +148,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
         elif "chromosomeLength" in self.path:
             dicc = self.dictionary_split(self.path)
+
             if 'chromosome' in dicc and 'specie' in dicc and dicc['chromosome'] != '' and dicc['specie'] != '':
                 u_chromo = dicc['chromosome']
                 specie = dicc['specie']
@@ -165,7 +165,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                     json_response = True
                     long = 0
                     for element in info:
-                        if (element['name'] == u_chromo):
+                        if element['name'] == u_chromo:
                             long = element['length']
                     dic = dict()
                     dic['len'] = long
@@ -173,7 +173,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 else:
                     long = 0
                     for element in info:
-                        if (element['name'] == u_chromo):
+                        if element['name'] == u_chromo:
                             long = element['length']
                     contents = """
                                       <html>
@@ -192,7 +192,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
             # -- Generating the response message
             self.send_response(response_code)  # -- Status line: OK!
-            if (json_response == True):
+            if json_response:
                 # Define the content-type header:
                 self.send_header('Content-Type', 'application/json')
             else:
@@ -200,13 +200,25 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
             self.send_header('Content-Length', len(str.encode(contents)))
 
-            # The header is finished
-            self.end_headers()
+        # -- Generating the response message
+        self.send_response(response_code)  # -- Status line: OK!
 
-            # Send the response message
-            self.wfile.write(str.encode(contents))
+        if json_response:
+            # -- Define the content-type header:
+            self.send_header('Content-Type', 'application/json')
+        else:
+            self.send_header('Content-Type', 'text/html')
 
-            return
+        self.send_header('Content-Length', len(str.encode(contents)))
+
+        # The header is finished
+        self.end_headers()
+
+        # Send the response message
+        self.wfile.write(str.encode(contents))
+
+        return
+
 
 # ------------------------
 # - Server MAIN program
@@ -217,7 +229,6 @@ socketserver.TCPServer.allow_reuse_address = True
 
 # -- Open the socket server
 with socketserver.TCPServer(("", PORT), Handler) as httpd:
-
     print("Serving at PORT", PORT)
 
     # -- Main loop: Attend the client. Whenever there is a new
