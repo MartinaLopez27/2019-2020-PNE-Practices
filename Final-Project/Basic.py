@@ -4,6 +4,7 @@ import termcolor
 import json
 import http.client
 
+
 # Define the Server's port
 PORT = 8000
 
@@ -21,7 +22,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
 
         # Message to send back to the client
-        #We first program the code of the main page that will give the user back the index
+        # We first program the code of the main page that will give the user back the index
         if self.path == '/' or self.path == '/index.html':
             filename = 'index.html'
             with open(filename, 'r') as f:
@@ -45,10 +46,8 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                     resp = json.loads(text_json)
                     species_l = resp['species']
                     conn.close()
-                    contents = """
-                            <html>
-                            <body style="background-color: D7B7BC;"><FONT FACE="monospace" SIZE = 5 COLOR = 'white'><h3>List of the chosen limited species </h3></FONT>
-                            <ol>"""
+                    contents = """<html> <body style="background-color: D7B7BC;"><FONT FACE="monospace" SIZE = 5 
+                    COLOR = 'white'><h3>List of the chosen limited species </h3></FONT> <ol> """
                     limit = int(limit)
                     counter = 0
                     for specie in species_l:
@@ -76,10 +75,8 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                     text_json = r1.read().decode("utf-8")
                     resp = json.loads(text_json)
                     species_l = resp['species']
-                    contents = """
-                                            <html>
-                                            <body style="background-color: D7B7BC;"><FONT FACE="monospace" SIZE = 5 COLOR = 'white'><h3>List of all the species </h3></FONT>
-                                            <ol>"""
+                    contents = """<html> <body style="background-color: D7B7BC;"><FONT FACE="monospace" SIZE = 5 
+                    COLOR = 'white'><h3>List of all the species </h3></FONT> <ol> """
 
                     for specie in species_l:
                         contents = contents + "<li>" + specie['display_name'] + "</li>"
@@ -113,10 +110,8 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 resp = json.loads(text_json)
                 karyotype_l = resp['karyotype']
                 print(karyotype_l)
-                contents = """
-                                                        <html>
-                                                        <body style="background-color: D7B7BC;"><FONT FACE="monospace" SIZE = 5 COLOR = 'white'><h3>Chromosomes of the chosen specie: </h3></FONT>
-                                                        <ul>"""
+                contents = """<html> <body style="background-color: D7B7BC;"><FONT FACE="monospace" SIZE = 5 COLOR = 
+                'white'><h3>Chromosomes of the chosen specie: </h3></FONT> <ul> """
 
                 for elem in karyotype_l:
                     contents = contents + "<li>" + elem + "</li>"
@@ -163,10 +158,8 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                     if elem['name'] == chromo:
                         length = str(elem['length'])
                 print(length)
-                contents = """
-                                                                    <html>
-                                                                    <body style="background-color: D7B7BC;"><FONT FACE="monospace" SIZE = 5 COLOR = 'white'><h3>The length of the chromosome of the chosen specie is: </h3></FONT>
-                                                                    <ul>"""
+                contents = """<html> <body style="background-color: D7B7BC;"><FONT FACE="monospace" SIZE = 5 COLOR = 
+                'white'><h3>The length of the chromosome of the chosen specie is: </h3></FONT> <ul> """
 
                 contents = contents + "<li>" + length + "</li>"
 
