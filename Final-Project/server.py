@@ -4,7 +4,7 @@ import json
 import socketserver
 
 import termcolor
-from Seq import Seq
+#from Seq import Seq
 
 # Define the Server's port
 PORT = 8000
