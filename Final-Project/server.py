@@ -1,6 +1,6 @@
 import http.server
 import socketserver
-import requests
+#import requests
 import termcolor
 import json
 from Seq import Seq
