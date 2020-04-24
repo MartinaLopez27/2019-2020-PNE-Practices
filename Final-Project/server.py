@@ -69,11 +69,11 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
             jsonvalue = 0
 
-            # Assigning to the variable contents the name of the 'index.html' file
+            # Assigning to the variable contents the name of the 'indexgabi.html' file
 
-            contents = 'index.html'
+            contents = 'indexgabi.html'
 
-            # Open the file and read the content in 'index.html'
+            # Open the file and read the content in 'indexgabi.html'
 
             with open(contents, 'r') as a:
 

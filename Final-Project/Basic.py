@@ -42,7 +42,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         if verb == "/":
             # Open the form1.html file
             # Read the index from the file
-            contents = Path('basic index.html').read_text()
+            contents = Path('basic indexgabi.html').read_text()
             error_code = 200
 
         # -- Endpoints

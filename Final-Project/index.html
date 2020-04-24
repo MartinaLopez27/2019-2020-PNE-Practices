@@ -1,87 +1,97 @@
 <!DOCTYPE html>
-    <html lang="en" dir="ltr">
-      <head>
-        <meta charset="utf-8">
-        <title>FINAL PROJECT</title>
-      </head>
-      <body style="background-color: Lavender;">
-        <font face="cambria" size = 4 color = "black">
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>FINAL PRACTICE</title>
+  </head>
+  <body style="background-color: pink;font-family:courier;">
+  <h1><center>Browsing Genomes</center></h1>
 
-          <h1>Browsing Human and Vertebrates genome</h1>
-          <h2>BASIC Level Services</h2>
-
-
-        <p>1)List of species in the genome database</p>
-
-        <form action="/listSpecies" method="get">
-            </p>Limit: <input type="text" size="2" name="limit"></p>
-            <!-- Click here to show Json:
-             #<input type="checkbox" name="json" value="1"><br> -->
-            <input type="submit" value="Send">
-        </form>
+    <p></p>
+    <form action="/listSpecies" method="get">
+         Limiting number of species:
+        <br>
+        Number of species: <input type="text" size="4" name="limit"><br>
+        JSON response:
+        <input type="checkbox" name="json" value="1">
+        <br>
+        <input type="submit" value="Different names with a limiting number">
 
 
-        <p>2)Information about the karyotype:</p>
-        <form action="/karyotype" method="get">
-            </p>Select the species: <input type="text" size="12" name="specie"></p>
-            <!--Click here to show Json:
-             <input type="checkbox" name="json" value="1"><br> -->
-            <input type="submit" value="Send">
-        </form>
+    </form>
+  <form action="/karyotype" method="get">
+      <br>
+         Information about the karyotype of a specie:
+      <br>
+        Name of the specie: <input type="text" size="20" name="specie"><br>
+      JSON response:
+        <input type="checkbox" name="json" value="1">
+        <br>
+        <input type="submit" value="Karyotype of the specific specie">
 
+  </form>
 
-         <p>3)Chromosome Length</p>
-        <form action="/chromosomeLength" method="get">
-            </p>Select the species: <input type="text" size="12" name="specie"></p>
-            </p>Select a chromosome: <input type="text" size="4" name="chromo"></p>
-            <!-- Click here to show Json:
-             <input type="checkbox" name="json" value="1"><br> -->
-            <input type="submit" value="Send">
-        </form>
+  <form action="/chromosomeLength" method="get">
+      <br>
+         Information about the length of a chromosome:
+        <br>
+         Name of the specie:<input type="text" size="20" name="specie"><br>
+         Name of the chromosome: <input type="text" size="20" name="chromo"><br>
+          JSON response:
+            <input type="checkbox" name="json" value="1">
+            <br>
 
-            <!--<p>4.This form will provide the information about the Gene Sequence.</p>
-            <p>Remember you have to introduce a Gene, not a number or a specie.</p>
-        <form action="/geneSeq" method="get">
-            Gene desired:
-            <input type="text" size="12" name="gene"><br>
-            Click here to show Json:
-             <input type="checkbox" name="json" value="1"><br>
-            <input type="submit" value="Click here to obtain info">
-        </form>
+        <input type="submit" value="Length of the chromosome">
+  </form>
 
+  <form action="/geneSeq" method="get">
+      <br>
+         The sequence of a given human gene:
+        <br>
+         Name of a human gene:<input type="text" size="20" name="gene"><br>
+        JSON response:
+        <input type="checkbox" name="json" value="1">
+        <br>
+        <input type="submit" value="Sequence">
+  </form>
 
-            <p>5.This form will provide more information about the Gene Sequence.</p>
-            <p>Remember you have to introduce a Gene, not a number or a specie.</p>
-        <form action="/geneInfo" method="get">
-            Gene desired:
-            <input type="text" size="12" name="gene"><br>
-            Click here to show Json:
-             <input type="checkbox" name="json" value="1"><br>
-            <input type="submit" value="Click here to obtain info">
-        </form>
+    <form action="/geneInfo" method="get">
+      <br>
+         Information about the start, end, length, id and chromosome of a given human gene:
+        <br>
+         Name of a human gene:<input type="text" size="20" name="gene"><br>
+        JSON response:
+        <input type="checkbox" name="json" value="1">
+        <br>
+        <input type="submit" value="Information">
+  </form>
 
-            <p>6.This form will provide calculations about the Gene Sequence.</p>
-            <p>Remember you have to introduce a Gene, not a number or a specie.</p>
-        <form action="/geneCalc" method="get">
-            Gene desired:
-            <input type="text" size="12" name="gene"><br>
-            Click here to show Json:
-             <input type="checkbox" name="json" value="1"><br>
-            <input type="submit" value="Click here to obtain info">
-        </form>
+    <form action="/geneCal" method="get">
+      <br>
+         Information about the total length and the percentage of all its bases of a given human gene:
+        <br>
+         Name of a human gene:<input type="text" size="20" name="gene"><br>
+        JSON response:
+        <input type="checkbox" name="json" value="1">
+        <br>
+        <input type="submit" value="Length and Percentage">
+  </form>
 
-            <p>7.This form will provide the name, end and start about the Gene Sequence.</p>
-            <p>Remember you have to introduce a Gene number, not a gene name or a specie.</p>
-        <form action="/geneList" method="get">
-            Chromosome desired:
-            <input type="text" size="12" name="chromo"><br>
-            Start number:
-            <input type="text" size="12" name="start"><br>
-            End number:
-            <input type="text" size="12" name="end"><br>
-            Click here to show Json:
-             <input type="checkbox" name="json" value="1"><br>
-            <input type="submit" value="Click here to obtain info">
-        </form> -->
-      </body>
-    </html>
+    <form action="/geneList" method="get">
+      <br>
+         Names of the genes of a given human chromosome:
+        <br>
+         Name of a human chromosome:<input type="text" size="20" name="chromo"><br>
+         Start position:<input type="text" size="20" name="start"><br>
+         End position:<input type="text" size="20" name="end"><br>
+        JSON response:
+        <input type="checkbox" name="json" value="1">
+        <br>
+        <input type="submit" value="Names of genes">
+  </form>
+  <center><img src="https://cdn1.eldia.com/052015/1484090829152.jpg"
+     width="400"
+     height="341"
+     title="A Chromosome"></center>
+  </body>
+</html>

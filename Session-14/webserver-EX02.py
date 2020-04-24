@@ -32,7 +32,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         if path == "":
             path = "index.html"
 
-        elif path =="index.html":
+        elif path =="indexgabi.html":
             termcolor.cprint("Main page requested", 'blue')
 
             # IN this simple server version:

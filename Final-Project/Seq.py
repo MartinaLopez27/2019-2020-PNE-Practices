@@ -2,7 +2,7 @@ class Seq:
     def __init__(self, strbase):  # -- Initialize variables
         self.strbase = strbase
 
-    def get_strbase(self):  # -- Return a variable
+    def get_sequence(self):  # -- Return a variable
         return self.strbase
 
     def len(self):  # -- Get the lenght of a sequence
