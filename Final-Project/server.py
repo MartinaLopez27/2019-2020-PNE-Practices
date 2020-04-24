@@ -1,1348 +1,309 @@
-import socketserver
-import termcolor
 import http.server
-import http.client
+import socketserver
+import requests
+import termcolor
 import json
 from Seq import Seq
 
-# Define the server's port, the hostname and method
-HOSTNAME = "rest.ensembl.org"
 
-METHOD = "GET"
+def species_connect(server, endpoint, para):
+    if 'specie' in para.keys():
+        specie = para['specie']
+        try:
+            chromo = para['chromo']
+        except KeyError:
+            chromo = ""
+        url_link = server + endpoint + specie + "/" + chromo
+        r = requests.get(url_link, headers={"Content-Type": "application/json"})
+        if not r.ok:
+            error = r.json()['error']
+            return {'error': error}
 
-PORT = 8000
+        try:
+            length = r.json()['length']
+            return {'length': length}
+        except KeyError:
+            data_karyotype = r.json()['karyotype']
+            return {'karyotype': data_karyotype}
+
+    else:
+        r = requests.get(server + endpoint, headers={"Content-Type": "application/json"})
+
+        if not r.ok:
+            error = r.json()['error']
+            return {'error': error}
+
+        data_species = r.json()['species']
+        return {'list_species': data_species}
 
 
-# Class with our Handler. It is a called derived from BaseHTTPRequestHandler
+def get_id(server, name):
+    endpoint = "/xrefs/symbol/homo_sapiens/" + name['gene']
+    url_link = server + endpoint
+    r = requests.get(url_link, headers={"Content-Type": "application/json"})
+
+    try:
+        gene_id = r.json()[0]['id']
+    except IndexError:
+        error = "Bad Request for url: " + '<a href="{}">{}</a>'.format(url_link, url_link) + " Gene name does not exist"
+        return {'error': error}
+    return {'gene_id': gene_id}
+
+
+def get_gene_data(server, gene_id):
+    endpoint = "/sequence/id/" + gene_id['gene_id']
+    data_id = json.dumps({"ids": [gene_id]})
+    r = requests.get(server + endpoint, headers={"Content-Type": "application/json"}, data=data_id)
+    gene_data = r.json()
+    return {'gene_data': gene_data}
+
+
+def gene_calc(gene_seq):
+    seq_calc = Seq(gene_seq)
+    bases = set(seq_calc.strbases)
+    total_length = seq_calc.len()
+    p_bases = {}
+    c_bases = {}
+    for base in bases:
+        p_bases.update({base: str(seq_calc.perc(base)) + "%"})
+        c_bases.update({base: seq_calc.count(base)})
+    bases_data = {'p_bases': p_bases, 'c_bases': c_bases, 'total_length': total_length}
+    return bases_data
+
+
+def gene_list(server, parameters):
+    chromo = parameters['chromo']
+    start = parameters['start']
+    end = parameters['end']
+    endpoint = "/overlap/region/human/{}:{}-{}?feature=gene".format(chromo, start, end)
+    url_link = server + endpoint
+    r = requests.get(url_link, headers={"Content-Type": "application/json"})
+    if not r.ok:
+        error = r.json()['error']
+        return {'error': error}
+    list_gene = r.json()
+    if not list_gene:
+        return {'list_gene': "The is no gene between positions {} and {} in chromosome {}". format(start, end, chromo)}
+    return {'list_gene': list_gene}
+
+
+def url_wrong():
+    return {'error': "Something went wrong with the parameters"}
 
 
 class TestHandler(http.server.BaseHTTPRequestHandler):
 
-    # A function which takes the path and create a dictionary with all the parameters needed to answer the request
-
-    def convert_dict(self, path):
-
-        # Creating a dictionary with the different parameters contain in the path
-
-        Dict = dict()
-
-        if '?' in path:
-
-            keyvalue = path.split('?')[1]
-
-            keyvalue = keyvalue.split(' ')[0]
-
-            listt = keyvalue.split('&')
-
-            # Loop for iterating over the different values in the list 'listt' to fill the dictionary
-
-            for keyandvalue in listt:
-                name_parameter = keyandvalue.split('=')[0]
-
-                value_parameter = keyandvalue.split('=')[1]
-
-                Dict[name_parameter] = value_parameter
-
-        return Dict
-
-    # A method is called whenever the client invokes the GET method in the HTTP protocol request
-
     def do_GET(self):
-
-        # To indicate that the response is OK
-
-        HTTP_CODE = 200
-
-        # Print the request line
-
-        termcolor.cprint(self.requestline, 'green')
-
-        # Selecting type of resource that must be used to create the response to the client
-
-        # Whenever the resource '/' is selected, this part of the program is executed
-
-        if self.path == '/':
-
-            # Assigning a value to the variable 'jsonvalue'
-
-            # which then will be used to decide what content type should be sent in the headers
-
-            jsonvalue = 0
-
-            # Assigning to the variable contents the name of the 'indexgabi.html' file
-
-            contents = 'indexgabi.html'
-
-            # Open the file and read the content in 'indexgabi.html'
-
-            with open(contents, 'r') as a:
-
-                contents = a.read()
-
-                a.close()
-
-        # Whenever the resource '/listSpecies' is selected, this part of the program is executed
-
-        elif '/listSpecies' in self.path:
-
-            # Condition to differentiate when a limit of species is requested and when it is not
-
-            if 'limit' in self.path:
-
-                # This try-catch is created to deal with Type errors
-
-                try:
-
-                    # Create a variable of class Dict which contains the parameters needed to find
-
-                    # a proper response to the client
-
-                    keyandvalue = self.convert_dict(self.path)
-
-                    # Using the key 'limit' in the Dictionary 'keyandvalue' to assign that value to the variable 'limit'
-
-                    limit = keyandvalue['limit']
-
-                    # Define the endpoint and the headers
-
-                    ENDPOINT = "/info/species?content-type=application/json"
-
-                    headers = {'User-Agent': 'http-client'}
-
-                    # Establishing connection to the Server
-
-                    conn = http.client.HTTPConnection(HOSTNAME)
-
-                    conn.request(METHOD, ENDPOINT, None, headers)
-
-                    # Get the response
-
-                    r1 = conn.getresponse()
-
-                    # Check The status of the response
-
-                    print()
-
-                    print("Response received: ", end='')
-
-                    print(r1.status, r1.reason)
-
-                    # Decoding the response
-
-                    text_json = r1.read().decode("utf-8")
-
-                    # Closing the connection
-
-                    conn.close()
-
-                    # Creating a dictionary from the response received
-
-                    data1 = json.loads(text_json)
-
-                    # Creating a list with the species
-
-                    species = data1['species']
-
-                # This part of the code is executed whenever a type error arises
-
-                except TypeError:
-
-                    # To indicate that the response is not OK
-
-                    HTTP_CODE = 404
-
-                    # Define the endpoint and the headers
-
-                    ENDPOINT = "/info/species?content-type=application/json"
-
-                    headers = {'User-Agent': 'http-client'}
-
-                    # Establishing connection to the Server
-
-                    conn = http.client.HTTPConnection(HOSTNAME)
-
-                    conn.request(METHOD, ENDPOINT, None, headers)
-
-                    # Get the response
-
-                    r1 = conn.getresponse()
-
-                    # Check The status of the response
-
-                    print()
-
-                    print("Response received: ", end='')
-
-                    print(r1.status, r1.reason)
-
-                    # Decoding the response
-
-                    text_json = r1.read().decode("utf-8")
-
-                    # Closing the connection
-
-                    conn.close()
-
-                    # Creating a list from the response received
-
-                    data1 = json.loads(text_json)
-
-                    # Creating a list with the species
-
-                    species = data1['species']
-
-                    # Assigning the value of the number of all the species to the variable limit to deal with this error
-
-                    limit = len(species)
-
-                # This try-catch deals with value errors
-
-                try:
-
-                    int(limit)
-
-                except ValueError:
-
-                    # To indicate that the response is not OK
-
-                    HTTP_CODE = 404
-
-                    limit = len(species)
-
-            # Condition executed when the limit is not requested
-
-            else:
-
-                # Define the endpoint and the headers
-
-                ENDPOINT = "/info/species?content-type=application/json"
-
-                headers = {'User-Agent': 'http-client'}
-
-                # Establishing connection to the Server
-
-                conn = http.client.HTTPConnection(HOSTNAME)
-
-                conn.request(METHOD, ENDPOINT, None, headers)
-
-                # Get the response
-
-                r1 = conn.getresponse()
-
-                # Check The status of the response
-
-                print()
-
-                print("Response received: ", end='')
-
-                print(r1.status, r1.reason)
-
-                # Decoding the response
-
-                text_json = r1.read().decode("utf-8")
-
-                # Closing the connection
-
-                conn.close()
-
-                # Creating a dictionary from the response received
-
-                data1 = json.loads(text_json)
-
-                # Creating a list with the species
-
-                species = data1['species']
-
-                # Assigning the value of the number of all the species to the variable limit to deal with this error
-
-                limit = len(species)
-
-            # Define a counter and an list which after going over the loop will contain the names of the species
-
-            count = 0
-
-            List = []
-
-            # Loop for going over the list of species and taking their names until the limit has been reached
-
-            for one in species:
-
-                specie = one['name']
-
-                List.append(specie)
-
-                count = count + 1
-
-                if int(count) == int(limit):
-                    break
-
-            # Creating a dictionary which contains the name of the species
-
-            Dict = {}
-
-            Dict['Species'] = List
-
-            # Loop to decide whether to send a json or a html file depending if the parameter json=1 was selected or not
-
-            if 'json=1' in self.path:
-
-                # Assigning a value to the variable 'jsonvalue'
-
-                # which then will be used to decide what content type should be sent in the headers
-
-                jsonvalue = 1
-
-                # Converting in text json the dictionary 'Dict' and assigning it to the variable 'contents'
-
-                contents = json.dumps(Dict)
-
-            else:
-
-                # Assigning a value to the variable 'jsonvalue'
-
-                # which then will be used to decide what content type should be sent in the headers
-
-                jsonvalue = 0
-
-                # Creating a html text with the name of the species and assigning it to the variable 'contents'
-
-                contents = """
-                            <html>
-                  <body style="background-color: green;">
-                    <h1>List of all species</h1>
-                            <ul>"""
-
-                count = 0
-
-                for one in species:
-
-                    contents = contents + '<li>' + one['name'] + '</li>'
-
-                    count = count + 1
-
-                    if int(count) == int(limit):
-                        break
-
-                contents = contents + """
-                            </ul>
-                            </body>
-                            </html>
-                            """
-
-        # Whenever the resource '/listSpecies' is selected, this part of the program is executed
-
-        elif '/karyotype' in self.path:
-
-            # Create a variable of class Dict which contains the parameters needed to find
-
-            # a proper response to the client
-
-            keyandvalue = self.convert_dict(self.path)
-
-            # This try-catch deals with key errors
-
-            try:
-
-                # Using the key 'specie' in the Dictionary 'keyandvalue' to assign that value to the variable 'name'
-
-                name = keyandvalue['specie']
-
-                # Define the endpoint and the headers
-
-                ENDPOINT = "/info/assembly/" + name + "?"
-
-                headers = {'Content-Type': 'application/json'}
-
-                # Establishing connection to the Server
-
-                conn = http.client.HTTPConnection(HOSTNAME)
-
-                conn.request(METHOD, ENDPOINT, None, headers)
-
-                # Get the response
-
-                r1 = conn.getresponse()
-
-                # Check The status of the response
-
-                print()
-
-                print("Response received: ", end='')
-
-                print(r1.status, r1.reason)
-
-                # Decoding the response
-
-                text_json = r1.read().decode("utf-8")
-
-                # Closing the connection
-
-                conn.close()
-
-                # Creating a dictionary from the response received
-
-                response = json.loads(text_json)
-
-                # Using the key 'karyotype' to assign that value to the variable 'karyotype'
-
-                karyotype = response['karyotype']
-
-                # Creating a dictionary which contains the karyotype of the specie
-
-                Dict = {}
-
-                Dict['karyotype'] = response['karyotype']
-
-                # Loop to decide whether to send a json or a html file depending
-
-                # if the parameter json=1 was selected or not
-
-                if 'json=1' in self.path:
-
-                    # Assigning a value to the variable 'jsonvalue'
-
-                    # which then will be used to decide what content type should be sent in the headers
-
-                    jsonvalue = 1
-
-                    # Converting in text json the dictionary 'Dict' and assigning it to the variable 'contents'
-
-                    contents = json.dumps(Dict)
-
-                else:
-
-                    # Assigning a value to the variable 'jsonvalue'
-
-                    # which then will be used to decide what content type should be sent in the headers
-
-                    jsonvalue = 0
-
-                    # Creating a html text with the karyotype of the specie and assigning it to the variable 'contents'
-
-                    contents = """
-                                <html>
-                      <body style="background-color: lightblue;">
-                        <h1>Karyotype</h1>
-                                <ul>"""
-
-                    for one in karyotype:
-                        contents = contents + '<li>' + one + '</li>'
-
-                    contents = contents + """
-                                </ul>
-                                </body>
-                                </html>
-                                """
-
-            except KeyError:
-
-                # Assigning a value to the variable 'jsonvalue'
-
-                # which then will be used to decide what content type should be sent in the headers
-
-                jsonvalue = 0
-
-                # To say that the response received is not OK
-
-                HTTP_CODE = 404
-
-                # Creating a html text with 'Invalid name' to indicate that the name chosen it's not in available
-
-                # and assigning it to the variable 'contents'
-
-                contents = """
-                            <html>
-                  <body style="background-color: lightblue;">
-                    <h1>Invalid Name</h1>
-                            </body>
-                            </html>
-                            """
-
-        # Whenever the resource '/chromosomeLength' is selected, this part of the program is executed
-
-        elif '/chromosomeLength' in self.path:
-
-            # Create a variable of class Dict which contains the parameters needed to find
-
-            # a proper response to the client
-
-            keyandvalue = self.convert_dict(self.path)
-
-            # This try-catch deals with key errors
-
-            try:
-
-                # Using the key 'specie' in the Dictionary 'keyandvalue' to assign that value
-                # to the variable 'name_specie'
-
-                name_specie = keyandvalue['specie']
-
-                # Using the key 'chromo' in the Dictionary 'keyandvalue' to assign that value
-                # to the variable 'name_chromo'
-
-                name_chromo = keyandvalue['chromo']
-
-                # Define the endpoint and the headers
-
-                ENDPOINT = "/info/assembly/" + name_specie + "?"
-
-                headers = {'Content-Type': 'application/json'}
-
-                # Establishing connection to the Server
-
-                conn = http.client.HTTPConnection(HOSTNAME)
-
-                conn.request(METHOD, ENDPOINT, None, headers)
-
-                # Get the response
-
-                r1 = conn.getresponse()
-
-                # Check The status of the response
-
-                print('Response received: {}\n'.format(r1.status, r1.reason))
-
-                # Decoding the response
-
-                data1 = r1.read().decode('utf-8')
-
-                # Closing the connection
-
-                conn.close()
-
-                # Creating a dictionary from the response received
-
-                response = json.loads(data1)
-
-                # Using the key 'top_level_region' in the Dictionary 'parameters'
-
-                # to assign that value to the variable 'response'
-
-                response = response['top_level_region']
-
-                # Creating a loop to find the length of the chromosome
-
-                for number in response:
-
-                    if number['name'] == name_chromo:
-                        length = number['length']
-
-                # Creating a dictionary which contains the length of the chromosome
-
-                Dict = {}
-                Dict['length'] = length
-
-                # Loop to decide whether to send a json or a html file depending if the parameter json=1 was selected
-
-                if 'json=1' in self.path:
-
-                    # Assigning a value to the variable 'jsonvalue'
-
-                    # which then will be used to decide what content type should be sent in the headers
-
-                    jsonvalue = 1
-
-                    # Converting in text json the dictionary 'Dict' and assigning it to the variable 'contents'
-
-                    contents = json.dumps(Dict)
-
-                else:
-
-                    # Assigning a value to the variable 'jsonvalue'
-
-                    # which then will be used to decide what content type should be sent in the headers
-
-                    jsonvalue = 0
-
-                    # Creating a html text with the length of the chromosome and assigning it to the variable 'contents'
-
-                    contents = """
-                                  <html>
-                    <body style="background-color: pink;">
-                    <h1>Length of the Chromosome</h1>
-                                    """
-
-                    for number in response:
-
-                        if number['name'] == name_chromo:
-                            contents = contents + str(number['length'])
-
-                    contents = contents + """
-                                </body>
-                                </html>
-                                """
-
-            except KeyError:
-
-                # Assigning a value to the variable 'jsonvalue'
-
-                # which then will be used to decide what content type should be sent in the headers
-
-                jsonvalue = 0
-
-                # To say that the response received is not OK
-
-                HTTP_CODE = 404
-
-                # Creating a html text with 'Invalid name' to indicate that the name chosen it's not in available
-
-                # and assigning it to the variable 'contents'
-
-                contents = """
-                               <html>
-                    <body style="background-color: lightblue;">
-                         <h1>Invalid Name</h1>
-                              </body>
-                            </html>
-                        """
-
-        # Whenever the resource '/geneSeq' is selected, this part of the program is executed
-
-        elif "/geneSeq" in self.path:
-
-            # Create a variable of class Dict which contains the parameters needed to find
-
-            # a proper response to the client
-
-            keyandvalue = self.convert_dict(self.path)
-
-            # This try-catch deals with key errors
-
-            try:
-
-                # Using the key 'gene' in the Dictionary 'keyandvalue' to assign that value to the variable 'gene_name'
-
-                gene_name = keyandvalue['gene']
-
-                # Define the endpoint and the headers
-
-                ENDPOINT = "/homology/symbol/human/" + gene_name + "?content-type=application/json"
-
-                headers = {'User-Agent': 'http-client'}
-
-                # Establishing connection to the Server
-
-                conn = http.client.HTTPConnection(HOSTNAME)
-
-                conn.request(METHOD, ENDPOINT, None, headers)
-
-                # Get the response
-
-                r1 = conn.getresponse()
-
-                # Check The status of the response
-
-                print('Response received: {}\n'.format(r1.status, r1.reason))
-
-                # Decoding the response
-
-                data1 = r1.read().decode('utf-8')
-
-                # Closing the connection
-
-                conn.close()
-
-                # Creating a dictionary from the response received
-
-                response = json.loads(data1)
-
-                # Using the key 'data', indexing in the first position, and using the key 'id'
-
-                # to assign that value to the variable 'id'
-
-                id = response['data'][0]['id']
-
-                # Establishing connection to the Server
-
-                conn.request('GET', '/sequence/id/' + id + '?content-type=application/json')
-
-                # Get the response
-
-                r1 = conn.getresponse()
-
-                # Decoding the response
-
-                data1 = r1.read().decode('utf-8')
-
-                # Closing the connection
-
-                conn.close()
-
-                # Creating a dictionary from the response received
-
-                response = json.loads(data1)
-
-                # Using the key 'seq' to assign that value to the variable 'DNAsequence'
-
-                DNAsequence = response['seq']
-
-                # Creating a dictionary which contains the sequence of DNA
-
-                Dict = {}
-
-                Dict['DNAsequence'] = response['seq']
-
-                # Loop to decide whether to send a json or a html file depending if the parameter json=1 was selected or not
-
-                if 'json=1' in self.path:
-
-                    # Assigning a value to the variable 'jsonvalue'
-
-                    # which then will be used to decide what content type should be sent in the headers
-
-                    jsonvalue = 1
-
-                    # Converting in text json the dictionary 'Dict' and assigning it to the variable 'contents'
-
-                    contents = json.dumps(Dict)
-
-                else:
-
-                    # Assigning a value to the variable 'jsonvalue'
-
-                    # which then will be used to decide what content type should be sent in the headers
-
-                    jsonvalue = 0
-
-                    # Creating a html text with the sequence of DNA and assigning it to the variable 'contents'
-
-                    contents = """
-                                  <html>
-                        <body style="background-color: lightgreen;">
-                          <h1>DNA sequence</h1>
-                            """ + DNAsequence + """
-                                  </body>
-                                  </html>
-                                  """
-
-            except KeyError:
-
-                # Assigning a value to the variable 'jsonvalue'
-
-                # which then will be used to decide what content type should be sent in the headers
-
-                jsonvalue = 0
-
-                # To say that the response is not OK
-
-                HTTP_CODE = 404
-
-                # Creating a html text with 'Invalid name' to indicate that the name chosen it's not in available
-
-                # and assigning it to the variable 'contents'
-
-                contents = """
-                        <html>
-             <body style="background-color: lightblue;">
-                    <h1>Invalid Name</h1>
-                         </body>
-                        </html>
-                            """
-
-        # Whenever the resource '/geneInfo' is selected, this part of the program is executed
-
-        elif "/geneInfo" in self.path:
-
-            # Create a variable of class Dict which contains the parameters needed to find
-
-            # a proper response to the client
-
-            keyandvalue = self.convert_dict(self.path)
-
-            # This try-catch deals with key errors
-
-            try:
-
-                # Using the key 'gene' in the Dictionary 'keyandvalue' to assign that value to the variable 'gene_name'
-
-                gene_name = keyandvalue['gene']
-
-                # Define the endpoint and the headers
-
-                ENDPOINT = "/homology/symbol/human/" + gene_name + "?content-type=application/json"
-
-                headers = {'User-Agent': 'http-client'}
-
-                # Establishing connection to the Server
-
-                conn = http.client.HTTPConnection(HOSTNAME)
-
-                conn.request(METHOD, ENDPOINT, None, headers)
-
-                # Get the response
-
-                r1 = conn.getresponse()
-
-                # Check The status of the response
-
-                print('Response received: {}\n'.format(r1.status, r1.reason))
-
-                # Decoding the response
-
-                data1 = r1.read().decode('utf-8')
-
-                # Closing the connection
-
-                conn.close()
-
-                # Creating a dictionary from the response received
-
-                response = json.loads(data1)
-
-                # Using the key 'data', indexing in the first position, and using the key 'id'
-
-                # to assign that value to the variable 'id'
-
-                idd = response['data'][0]['id']
-
-                # Define the endpoint and the headers
-
-                ENDPOINT = "/overlap/id/" + idd + "?feature=gene;content-type=application/json"
-
-                headers = {'User-Agent': 'http-client'}
-
-                # Establishing connection to the Server
-
-                conn = http.client.HTTPConnection(HOSTNAME)
-
-                conn.request(METHOD, ENDPOINT, None, headers)
-
-                # Get the response
-
-                r1 = conn.getresponse()
-
-                # Check The status of the response
-
-                print('Response received: {}\n'.format(r1.status, r1.reason))
-
-                # Decoding the response
-
-                data1 = r1.read().decode('utf-8')
-
-                # Closing the connection
-
-                conn.close()
-
-                # Creating a dictionary from the response received
-
-                response1 = json.loads(data1)
-
-                # Indexing in the first position and using the key 'start' to assign that value to the variable 'start'
-
-                start = response1[0]['start']
-
-                # Indexing in the first position and using the key 'end' to assign that value to the variable 'end'
-
-                end = response1[0]['end']
-
-                # Subtracting the end-start to know the length and assigning that value to the variable 'length'
-
-                length = end - start
-
-                # Using the key 'assembly_name' in the Dictionary 'parameters' to assign that value
-                # to the variable 'chromo'
-
-                chromo = response1[0]['seq_region_name']
-
-                # Creating a dictionary which contains the name, start, end, and length of the chromosome
-
-                Features = {}
-
-                Features['start'] = response1[0]['start']
-
-                Features['end'] = response1[0]['end']
-
-                Features['length'] = length
-
-                Features['chromo'] = response1[0]['seq_region_name']
-
-                Features['id'] = idd
-
-                # Loop to decide whether to send a json or a html file depending if the parameter json=1 was selected
-
-                if 'json=1' in self.path:
-
-                    # Assigning a value to the variable 'jsonvalue'
-
-                    # which then will be used to decide what content type should be sent in the headers
-
-                    jsonvalue = 1
-
-                    # Converting in text json the dictionary 'Dict' and assigning it to the variable 'contents'
-
-                    contents = json.dumps(Features)
-
-                else:
-
-                    # Assigning a value to the variable 'jsonvalue'
-
-                    # which then will be used to decide what content type should be sent in the headers
-
-                    jsonvalue = 0
-
-                    # Creating a html text with the starting, ending, length, name of the chromosome and id of a gene
-
-                    # and assigning it to the variable 'contents'
-
-                    contents = """
-                                      <html>
-                            <body style="background-color: lightgreen;">
-                              <h1>Information about the Gene</h1>
-                                """ + 'Start: ' + str(start) + '<br>' + 'End: ' + str(end) + '<br>' + 'Length: ' + \
-                               str(length) + '<br>' + 'Chromosome: ' + str(chromo) + '<br>' + 'Id: ' + idd + """
-                                      </body>
-                                      </html>
-                                      """
-
-            except KeyError:
-
-                # Assigning a value to the variable 'jsonvalue'
-
-                # which then will be used to decide what content type should be sent in the headers
-
-                jsonvalue = 0
-
-                # To say that the response is not OK
-
-                HTTP_CODE = 404
-
-                # Creating a html text with 'Invalid name' to indicate that the name chosen it's not in available
-
-                # and assigning it to the variable 'contents'
-
-                contents = """
-                        <html>
-            <body style="background-color: lightblue;">
-                 <h1>Invalid Name</h1>
-                        </body>
-                         </html>
-                            """
-
-        # Whenever the resource '/geneCal' is selected, this part of the program is executed
-
-        elif '/geneCal' in self.path:
-
-            # Create a variable of class Dict which contains the parameters needed to find
-
-            # a proper response to the client
-
-            keyandvalue = self.convert_dict(self.path)
-
-            # This try-catch deals with key errors
-
-            try:
-
-                # Using the key 'gene' in the Dictionary 'keyandvalue' to assign that value to the variable 'gene_name'
-
-                gene_name = keyandvalue['gene']
-
-                # Define the endpoint and the headers
-
-                ENDPOINT = "/homology/symbol/human/" + gene_name + "?content-type=application/json"
-
-                headers = {'User-Agent': 'http-client'}
-
-                # Establishing connection to the Server
-
-                conn = http.client.HTTPConnection(HOSTNAME)
-
-                conn.request(METHOD, ENDPOINT, None, headers)
-
-                # Get the response
-
-                r1 = conn.getresponse()
-
-                # Check The status of the response
-
-                print('Response received: {}\n'.format(r1.status, r1.reason))
-
-                # Decoding the response
-
-                data1 = r1.read().decode('utf-8')
-
-                # Closing the connection
-
-                conn.close()
-
-                # Creating a dictionary from the response received
-
-                response = json.loads(data1)
-
-                # Using the key 'data', indexing in the first position, and using the key 'id'
-
-                # to assign that value to the variable 'id'
-
-                idd = response['data'][0]['id']
-
-                # Define the endpoint and the headers
-
-                ENDPOINT = "/sequence/id/" + idd + "?content-type=application/json"
-
-                headers = {'User-Agent': 'http-client'}
-
-                # Establishing connection to the Server
-
-                conn = http.client.HTTPConnection(HOSTNAME)
-
-                conn.request(METHOD, ENDPOINT, None, headers)
-
-                # Get the response
-
-                r1 = conn.getresponse()
-
-                # Check The status of the response
-
-                print('Response received: {}\n'.format(r1.status, r1.reason))
-
-                # Decoding the response
-
-                data1 = r1.read().decode('utf-8')
-
-                # Creating a dictionary from the response received
-
-                response = json.loads(data1)
-
-                # Using the key 'seq' to assign that value to the variable 'DNAsequence'
-
-                DNAsequence = response['seq']
-
-                # Creating an object of class Seq
-
-                seq = Seq(DNAsequence)
-
-                # Measuring the len of the sequence and assigning that value to the variable 'length'
-
-                length = len(DNAsequence)
-
-                # Calculating the percentage od each base using the class Seq
-
-                perc_A = seq.perc('A')
-
-                perc_C = seq.perc('C')
-
-                perc_T = seq.perc('T')
-
-                perc_G = seq.perc('G')
-
-                # Creating a dictionary which contains the length of the sequence and the percentage of each base
-
-                Calculations = {}
-
-                Calculations['length'] = length
-
-                Calculations['Perc_A'] = perc_A
-
-                Calculations['Perc_c'] = perc_C
-
-                Calculations['Perc_T'] = perc_T
-
-                Calculations['Perc_G'] = perc_G
-
-                # Loop to decide whether to send a json or a html file depending if the parameter json=1 was selected
-
-                if 'json=1' in self.path:
-
-                    # Assigning a value to the variable 'jsonvalue'
-
-                    # which then will be used to decide what content type should be sent in the headers
-
-                    jsonvalue = 1
-
-                    # Converting in text json the dictionary 'Dict' and assigning it to the variable 'contents'
-
-                    contents = json.dumps(Calculations)
-
-                else:
-
-                    # Assigning a value to the variable 'jsonvalue'
-
-                    # which then will be used to decide what content type should be sent in the headers
-
-                    jsonvalue = 0
-
-                    # Creating a html text with the length, and percentage of each base of a gene
-
-                    # and assigning it to the variable 'contents'
-
-                    contents = """
-                              <html>
-                    <body style="background-color: lightgreen;">
-                      <h1>Total Length and Percentage of each Base</h1>
-                        """ + 'Length: ' + str(length) + '<br>' + "Percentage of A's: " + str(perc_A) + '%' + '<br>' + \
-                        "Percentage of C's: " + str(perc_C) + '%' + '<br>' + "Percentage of T's: " + str(perc_T)\
-                        + '%' + '<br>' + "Percentage of G's: " + str(perc_G) + '%' + """
-                          </body>
-                          </html>
-                          """
-
-            except KeyError:
-
-                # Assigning a value to the variable 'jsonvalue'
-
-                # which then will be used to decide what content type should be sent in the headers
-
-                jsonvalue = 0
-
-                # To say that the response is not OK
-
-                HTTP_CODE = 404
-
-                # Creating a html text with 'Invalid name' to indicate that the name chosen it's not in available
-
-                # and assigning it to the variable 'contents'
-
-                contents = """
-                                <html>
-                        <body style="background-color: lightblue;">
-                                <h1>Invalid Name</h1>
-                                    </body>
-                                    </html>
-                                    """
-
-        # Whenever the resource '/geneList' is selected, this part of the program is executed
-
-        elif "/geneList" in self.path:
-
-            # Create a variable of class Dict which contains the parameters needed to find
-
-            # a proper response to the client
-
-            keyandvalue = self.convert_dict(self.path)
-
-            # This try-catch deals with key errors
-
-            try:
-
-                # Using the key 'chromo' in the Dictionary 'keyandvalue' to assign that value to the variable 'chromo'
-
-                chromo = keyandvalue['chromo']
-
-                # Using the key 'start' in the Dictionary 'keyandvalue' to assign that value to the variable 'start'
-
-                start = keyandvalue['start']
-
-                # Using the key 'end' in the Dictionary 'keyandvalue' to assign that value to the variable 'end'
-
-                end = keyandvalue['end']
-
-                # Define the endpoint and the headers
-
-                ENDPOINT = "/overlap/region/human/" + str(chromo) + ":" + str(start) + "-" + str(
-                    end) + "?content-type=application/json;feature=gene;feature=transcript;feature=cds;feature=exon"
-
-                headers = {'User-Agent': 'http-client'}
-
-                # Establishing connection to the Server
-
-                conn = http.client.HTTPConnection(HOSTNAME)
-
-                conn.request(METHOD, ENDPOINT, None, headers)
-
-                # Get the response
-
-                response = conn.getresponse()
-
-                # Check The status of the response
-
-                print('Response received: {}\n'.format(response.status, response.reason))
-
-                # Decoding the response
-
-                data = response.read().decode("utf-8")
-
-                # Closing the connection
-
-                conn.close()
-
-                # Creating a dictionary from the response received
-
-                response2 = json.loads(data)
-
-                # Creating a variable which determine when the loop should break
-
-                stop = int(end) - int(start)
-
-                # Define a counter and an list which after going over the loop will contain the names of the genes
-
-                count = 0
-
-                List = []
-
-                # Loop for going over the list of possible genes and taking their names until the limit has been reached
-
-                for possiblegene in response2:
-
-                    if 'feature_type' in possiblegene and possiblegene['feature_type'] == 'gene':
-
-                        List.append(possiblegene['external_name'])
-
-                        count = count + 1
-
-                        if count == stop:
-                            break
-
-                # Creating a dictionary which contains the names of the genes in a precise segment of a chromosome
-
-                Dict = {}
-
-                Dict['Gene'] = List
-
-                # Loop to decide whether to send a json or a html file depending if the parameter json=1 was selected
-
-                if 'json=1' in self.path:
-
-                    # Assigning a value to the variable 'jsonvalue'
-
-                    # which then will be used to decide what content type should be sent in the headers
-
-                    jsonvalue = 1
-
-                    # Converting in text json the dictionary 'Dict' and assigning it to the variable 'contents'
-
-                    contents = json.dumps(Dict)
-
-                else:
-
-                    # Assigning a value to the variable 'jsonvalue'
-
-                    # which then will be used to decide what content type should be sent in the headers
-
-                    jsonvalue = 0
-
-                    # Creating a html text with the names of the genes located in a specific region in a chromosome
-
-                    # and assigning it to the variable 'contents'
-
-                    contents = """
-                                <html>
-                      <body style="background-color: green;">
-                        <h1>Name of Each Gene</h1>
-                                <ul>"""
-
-                    count = 0
-
-                    for possiblegene in response2:
-
-                        if 'feature_type' in possiblegene and possiblegene['feature_type'] == 'gene':
-                            contents = contents + '<li>' + possiblegene['external_name'] + '</li>'
-
-                            count = count + 1
-
-                            if count == stop:
-                                break
-
-                    contents = contents + """
-                                 </ul>
-                                </body>
-                                </html>
-                                """
-
-            except KeyError:
-
-                # Assigning a value to the variable 'jsonvalue'
-
-                # which then will be used to decide what content type should be sent in the headers
-
-                jsonvalue = 0
-
-                # To say that the response is not OK
-
-                HTTP_CODE = 404
-
-                # Creating a html text with 'Invalid name' to indicate that the name chosen it's not in available
-
-                # and assigning it to the variable 'contents'
-
-                contents = """
-                                                    <html>
-                                    <body style="background-color: lightblue;">
-                                                <h1>Invalid Name</h1>
-                                                     </body>
-                                                    </html>
-                                                        """
-
-        # Whenever the resource none of the above resources is selected, this part of the program is executed
+        contents = """<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>EnsemblRequest</title></head>"""
+        server = "http://rest.ensembl.org"
+        termcolor.cprint(self.requestline, 'blue')
+        total_request = self.path.split('?')
+        request = total_request.pop(0)
+        json_para = False
+        data = ""
+        try:
+            r_para = total_request[0].split('&')
+            para = dict()
+            for i in r_para:
+                i = i.split("=")
+                para.update({i[0]: i[1]})
+            if 'json' in para.keys():
+                del para['json']
+                json_para = True
+        except IndexError:
+            para = dict()
+
+        if request == "/":
+            f = open("form.html", 'r')
+            contents = f.read()
+            data = {'Error': "No endpoint given"}
+            f.close()
 
         else:
+            if request == "/listSpecies":
+                endpoint = "/info/species"
+                if not para:
+                    para.update({'limit': 199})
+                elif 'limit' not in para.keys():
+                    contents += """<body><h1> Something went wrong</h1>The parameters are not correct"""
+                    data = {'error': "Parameters are not correct"}
+                elif not para['limit']:
+                    para.update({'limit': 199})
+                if 'limit' in para.keys():
+                    try:
+                        limit = int(para['limit'])
+                    except ValueError:
+                        limit = "Limit must be an integer"
+                    data = species_connect(server, endpoint, para)
+                    if type(limit) is int:
+                        list_species = list()
+                        try:
+                            for i in range(limit):
+                                list_species.append(data['list_species'][i]['name'])
+                            contents += """<body><h1>List of species</h1>
+                                                    <ul><li>{}</li><ul>""".format("</li><li>".join(list_species))
+                        except IndexError:
+                            list_species = "The limit can't be superior to 199"
+                            contents += """<body><h1>List of species</h1>
+                                                        <ul>{}<ul>""".format(list_species)
 
-            # Assigning a value to the variable 'jsonvalue'
-            # which then will be used to decide what content type should be sent in the headers
+                    else:
+                        list_species = "The limit must be an integer"
+                        contents += """<body><h1>List of species</h1>
+                                                        <ul>{}<ul>""".format(list_species)
+                    data = {'list_species': list_species}
 
-            jsonvalue = 0
+            elif request == "/karyotype":
+                endpoint = "/info/assembly/"
+                if 'specie' not in para.keys():
+                    contents += """<body><h1> Something went wrong</h1>The parameters are not correct"""
+                    data = {'error': "Parameters are not correct"}
+                elif not para['specie']:
+                    contents += """<body><h1> Something went wrong</h1>You must fill the specie form"""
+                    data = {'error': "Parameters are not correct"}
+                else:
+                    data = species_connect(server, endpoint, para)
+                    if data:
+                        list_karyotype = "<ul>"
+                        if 'karyotype' in data.keys():
+                            for i in range(len(data['karyotype'])):
+                                list_karyotype += "<li>" + data['karyotype'][i] + "</li>"
+                            list_karyotype += "<ul>"
+                        else:
+                            list_karyotype += data['error']
+                        list_karyotype += "<ul>"
+                    else:
+                        list_karyotype = "<ul> There is no available information for the karyotype of this specie <ul>"
+                    contents += """<body><h1>{} Karyotype information</h1>{}""".format(para['specie'], list_karyotype)
 
-            # To say that the response is not OK
+            elif request == "/chromosomeLength":
+                endpoint = "/info/assembly/"
+                if 'specie' not in para.keys() or 'chromo' not in para.keys():
+                    contents += """<body><h1> Something went wrong</h1>The parameters are not correct"""
+                    data = {'error': "Parameters are not correct"}
+                elif not para['specie'] or not para['chromo']:
+                    contents += """<body><h1>Something went wrong</h1>Must fill the chromosome and the specie form"""
+                    data = {'error': "Parameters are not correct"}
+                else:
+                    data = species_connect(server, endpoint, para)
+                    if 'length' in data.keys():
+                        contents += """<body><h2>Chromosome length</h2>
+                        Chromosome {} of {} is {} length""".format(para['chromo'], para['specie'], data['length'])
+                    else:
+                        contents += """<body><h2>Something went wrong in the request</h2>{}""".format(data['error'])
 
-            HTTP_CODE = 404
+            elif request.startswith("/gene"):
+                gene_request = request.lstrip("/gene")
 
-            # Assigning to the variable contents the name of the 'error.html' file
+                if gene_request == "List":
+                    if ('chromo' or 'start' or 'end') not in para.keys():
+                        contents += """<body><h1> Something went wrong</h1>The parameters are not correct"""
+                        data = {'error': "Parameters are not correct"}
+                    elif not (para['chromo'] or para['start'] or para['end']):
+                        contents += """<body><h1> Something went wrong</h1>You must fill the form"""
+                        data = {'error': "Parameters are not correct"}
+                    else:
+                        data = gene_list(server, para)
+                        list_gene = list()
+                        if 'list_gene' in data.keys():
+                            for i in range(len(data['list_gene'])):
+                                list_gene.append(data['list_gene'][i]['external_name'])
+                            data = {'list_gene': list_gene}
+                        else:
+                            list_gene.append(data['error'])
+                            data = {'error': list_gene}
+                        contents += """<body><h2>Genes list</h2>
+                        <h3>    Chromosome {}. Start position: {}. End position: {}</h3>
+                        <p><li>{}</p>""".format(para['chromo'], para['start'], para['end'], "</li><li>".join(list_gene))
+                elif 'gene' not in para.keys():
+                    contents += """<body><h1> Something went wrong</h1>The parameters are not correct"""
+                    data = {'error': "Parameters are not correct"}
+                elif not para['gene']:
+                    contents += """<body><h1> Something went wrong</h1>You must fill the form"""
+                    data = {'error': "Parameters are not correct"}
 
-            contents = 'error.html'
+                else:
+                    gene_id = get_id(server, para)
+                    if 'gene_id' in gene_id.keys():
+                        g_data = get_gene_data(server, gene_id)
+                        if 'gene_data' in g_data.keys():
+                            data = g_data['gene_data']['seq']
 
-            # Open the file and read its content
+                            if gene_request == "Seq":
+                                contents += """<body><h2>Gene sequence</h2>
+                                 <p style='word-break: break-all'>{}</p>""".format(data)
+                                data = {'gene_seq': data}
 
-            with open(contents, 'r') as a:
-                contents = a.read()
+                            elif gene_request == "Info":
+                                    desc_data = g_data['gene_data']['desc'].split(":")
+                                    data = {'gene_id': g_data['gene_data']['id'], 'start': desc_data[3],
+                                            'end': desc_data[4], 'chromosome': desc_data[2], 'length': len(data)}
+                                    # noinspection PyTypeChecker
+                                    contents += """<body><h2>Gene information</h2>
+                                     <p>Gene Id: {}</p><p>Start Position: {}</p>
+                                     <p>End Position: {}</p><p>Chromosome: {}</p><p>Length: {}
+                                     </p>""".format(data['gene_id'], data['start'],
+                                                    data['end'], data['chromosome'], data['length'])
 
-                a.close()
+                            elif gene_request == "Calc":
+                                data = gene_calc(data)
+                                p_table = "{:<5} : {:<5}".format('Base', 'Percentage')
+                                for k, v in data['p_bases'].items():
+                                    p_table += "<p>{:<5} : {:<5}</p>".format(k, v)
+                                c_table = "{:<5} : {:<5}".format('Base', 'Count')
+                                for k, v in data['c_bases'].items():
+                                    c_table += "<p>{:<5} : {:<5}</p>".format(k, v)
+                                contents += """<body><h2> {} Gene Calculations</h2>
+                                 <p>{}</p>
+                                 <p>{}</p>
+                                 <p>Total length: {}</p>""".format(para['gene'], p_table, c_table, data['total_length'])
 
-        # Generating the response message
+                        else:
+                            data = g_data
+                            contents += """<body><h1> Something went wrong</h1><p>{}</p>""".format(data['error'])
 
-        self.send_response(HTTP_CODE)  # -- Status line: OK!
+                    else:
+                        data = gene_id
+                        contents += """<body><h1> Something went wrong</h1><p>{}</p>""".format(data['error'])
 
-        # Creating a loop to choose what 'content type' in headers should be added
-
-        if jsonvalue == 1:
-
-            # Define the content-type header:
-
-            self.send_header('Content-Type', 'application/json')
-
-        else:
-
-            # Define the content-type header:
+            else:
+                f = open("error.html", 'r')
+                contents = f.read()
+                f.close()
+            contents += """<p><a href="/">Main page</a></p></body></html>"""
+        if not json_para:
+            self.send_response(200)
 
             self.send_header('Content-Type', 'text/html')
+            self.send_header('Content-Length', len(str.encode(contents)))
+            self.end_headers()
 
-        self.send_header('Content-Length', len(str.encode(contents)))
+            # -- Sending the body of the response message
+            self.wfile.write(str.encode(contents))
+        else:
+            contents = json.dumps(data)
+            self.send_response(200)
 
-        # The header is finished
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(str.encode(contents)))
+            self.end_headers()
 
-        self.end_headers()
-
-        # Send the response message
-
-        self.wfile.write(str.encode(contents))
-
-        return
-
-# Main Program
+            # -- Sending the body of the response message
+            self.wfile.write(str.encode(contents))
 
 
-# -- Set the new handler
-
-Handler = TestHandler
-
+PORT = 8000
 socketserver.TCPServer.allow_reuse_address = True
 
-# -- Open the socket server
 
-with socketserver.TCPServer(("", PORT), Handler) as httpd:
-    print("Serving at PORT", PORT)
-
-    # -- Main loop: Attend the client. Whenever there is a new
-
-    # -- client, the handler is called
-
-    # Try-catch to deal with KeyboardInterrupt errors
+# -- Main program
+with socketserver.TCPServer(("", PORT), TestHandler) as httpd:
+    print("Serving at PORT: {}".format(PORT))
 
     try:
-
         httpd.serve_forever()
-
     except KeyboardInterrupt:
-
-        print("")
-
-        print("Stopped by the user")
-
         httpd.server_close()
+
+print("")
+print("Server Stopped")
