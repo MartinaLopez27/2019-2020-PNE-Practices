@@ -45,7 +45,57 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             contents = Path('basic index.html').read_text()
             error_code = 200
 
+        # -- Endpoints
         elif verb == "/listSpecies":
+            # this is the endpoint for retrieving species information from the API
+            server = "http://rest.ensembl.org"
+            ext = "/info/species?"
+            r = requests.get(server + ext, headers={"Content-Type": "application/json"})
+
+            if not r.ok:
+                r.raise_for_status()
+
+            decoded = r.json()
+
+            if "limit" in path:
+                variables = path.partition('?')[2]
+
+                # -- If there is not limit specified, we print all species
+                if variables == "limit=":
+                    title = "List of all available species in the database:"
+                    species = ''
+
+                # -- Iterate over each specie
+                for i in range(len(decoded['species'])):
+                    specie = 'Common name: ' + decoded['species'][i]['common_name'] + '\n  Scientific name: ' + \
+                             decoded['species'][i]['name'] + '\n\n'
+                    species += specie
+
+                # -- If the user enters a limit:
+                else:
+                    # -- Extract the given limit from the request line
+                    limit = variables.partition('=')[2]
+                    title = 'List of available species in the database (max ' + limit + '):'
+                    species = ''
+                    for i in range(int(limit)):
+                        specie = 'Common name: ' + decoded['species'][i]['common_name'] + '\n  Scientific name: ' + \
+                                 decoded['species'][i]['name'] + '\n\n'
+                        species += specie
+
+            # -- If the endpoint, doesnt have "limit", print all species
+            else:
+                title = 'List of all available species in the database:'
+                species = ''
+                for i in range(len(decoded['species'])):
+                    specie = 'Common name: ' + decoded['species'][i]['common_name'] + '\n  Scientific name: ' + \
+                             decoded['species'][i]['name'] + '\n\n'
+                    species += specie
+
+            # here we open the HTML file and replace from it the word 'TITLE' for the variable 'title' shown above and '----' for the actual information extracted from Ensembl
+            #content = open_file(title, species)
+
+
+            """
             conn = http.client.HTTPConnection('rest.ensembl.org')
             conn.request("GET", "/info/species?content-type=application/json")
             r1 = conn.getresponse()
@@ -54,27 +104,9 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             print()
             print("Response received: ", end='')
             print(r1.status, r1.reason)
+            """
 
-            # -- Generate the html code
-            contents = """
-                              <html>
-                              <body style ="background-color: salmon;">
-                              <ul> """
 
-            cont = 0
-            for specie in species:
-                contents = contents + "<li>" + specie['display_name'] + "</li>"
-                cont = cont + 1
-                print(cont, limit)
-                if (cont == limit):
-                    break
-
-            contents = contents + """<ul>
-                                              <body>
-                                              <html>
-                                              """
-
-            error_code = 200
 
         # Generating the response message
         self.send_response(error_code)  # -- Status line: OK!
@@ -110,3 +142,6 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
         print("")
         print("Stopped by the user")
         httpd.server_close()
+print("")
+print("Server stopped")
+
