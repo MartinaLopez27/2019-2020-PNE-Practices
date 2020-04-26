@@ -1,34 +1,43 @@
-import http.client
 import http.server
 import socketserver
-import json
 from pathlib import Path
 
+import requests
 import termcolor
 
 PORT = 8080  # -- Define the Server's port
 socketserver.TCPServer.allow_reuse_address = True  # -- This is for preventing the error: "Port already in use"
 
 
-def get_json(ENDPOINT):  # -- Access information contained in json files on the Ensembl API
-    conn = http.client.HTTPSConnection("rest.ensembl.org")
-    parameters = '?content-type=application/json'
+def get_json(server, endpoint, parameters):
+    if 'specie' in parameters.keys():
+        specie = parameters['specie']
+        try:
+            chromo = parameters['chromo']
+        except KeyError:
+            chromo = ""
+        url_link = server + endpoint + specie + "/" + chromo
+        r = requests.get(url_link, headers={"Content-Type": "application/json"})
+        if not r.ok:
+            error = r.json()['error']
+            return {'There are not species with that name': error}
 
-    if 'overlap' in ENDPOINT:
-        parameters = parameters + ';feature=gene'
+        try:
+            length = r.json()['length']
+            return {'length': length}
+        except KeyError:
+            data_karyotype = r.json()['karyotype']
+            return data_karyotype
 
-    conn.request('GET', ENDPOINT + parameters, None,
-                 {'User-Agent': 'http-client'})  # -- Establishing connection with our database server:
-    r1 = conn.getresponse()
+    else:
+        r = requests.get(server + endpoint, headers={"Content-Type": "application/json"})
 
-    print()  # -- Print the status
-    print("Response received: ", end='')
-    print(r1.status, r1.reason)
+        if not r.ok:
+            error = r.json()['error']
+            return {'error': error}
 
-    data1 = r1.read().decode("utf-8")  # -- Read the response's body and close the connection
-    conn.close()
-
-    return json.loads(data1)
+        data_species = r.json()['species']
+        return data_species
 
 
 class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritates all his methods and properties
@@ -46,19 +55,18 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                     dicctionary[key] = value
             return dicctionary
 
+
     def do_GET(self):
+        server = "http://rest.ensembl.org"
         termcolor.cprint(self.requestline, 'green')  # -- Print the request line
-        req_line = self.requestline.split(' ')  # -- Analize the request line
 
-        arguments = req_line[1].split('?')  # -- Get the path and read the parameters
-        verb = arguments[0]  # -- Get the first argument
-
-        if verb == "/":
+        if self.path == "/":
             contents = Path("index.html").read_text()
             error_code = 200
 
         # -- BASIC LEVEL
-        elif verb in "/listSpecies":
+        elif "listSpecies" in self.path:
+            endpoint = "/info/species"
             parameters = self.get_arguments(self.path)
 
             if 'limit' in parameters:  # -- In case the limit number is not included in the length of the info_list.
@@ -69,7 +77,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
             else:
                 limit = 0
 
-            info_list = get_json('/info/species')['species']
+            info_list = get_json(server, endpoint, parameters)
 
             if 0 < limit <= 267:
                 contents = f'''<!DOCTYPE html>
@@ -96,43 +104,45 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                         break
                 error_code = 200
 
-        elif verb in "/karyotype":
+        elif "karyotype" in self.path:
+            endpoint = "/info/assembly/"
             parameters = self.get_arguments(self.path)
 
-            if 'specie' in parameters and parameters['specie'] != '':  # In the case that a specie has a value assigned
-                parameters = parameters["specie"]
+            if 'specie' in parameters and parameters['specie'] != '':
                 try:
-                    info_list = get_json('/info/assembly/{}'.format(parameters))
-                    chromo_list = info_list["karyotype"]
+                    info_list = get_json(server, endpoint, parameters)
 
-                    contents = f'''<!DOCTYPE html>
-                           <html lang = "en">            
-                           <head>  
-                           <meta charset = "utf-8"
-                                 <title>The name of chromosomes are:</title>
-                                 </head>
-                                 <body style="background-color: lightblue;">       
-                          '''
+                    contents =  f'''<!DOCTYPE html>
+                                   <html lang = "en">            
+                                   <head>  
+                                   <meta charset = "utf-8"
+                                         <title>The names of the chromosomes are:</title>
+                                         </head>
+                                         <body style="background-color: lightblue;">       
+                                    '''
+                    
+                    for element in info_list:
+                        contents = contents + '<li>' + element + '</li>'
 
-                    for parameters in chromo_list:
-                        contents = contents + f'''<!DOCTYPE html> 
-                                                <ul class="a">
-                                                <li>{parameters['display_name']}</li>
-                                                </ul>
-                                                '''
-
-                    contents = contents + f'''<a href="/">Main page</a>
-                                                  </body>
-                                                  </html>'''
+                    contents = contents + '''<a href="/">Main page</a>
+                                          </body>
+                                          </html>'''
                     error_code = 200
-
-                except KeyError:  # -- In the case the introduced specie is not a valid one
+                    
+                except KeyError:
                     contents = Path('Error.html').read_text()
                     error_code = 404
-
-            else:  # In the case specie is not defined
+            else:
                 contents = Path('Error.html').read_text()
                 error_code = 404
+
+        
+
+                
+        else:
+            contents = Path('Error.html').read_text()
+            error_code = 404
+
 
         # -- Generating the response message
         self.send_response(error_code)  # -- Status line: OK!

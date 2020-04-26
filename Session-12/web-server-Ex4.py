@@ -32,7 +32,7 @@ def process_client(s):
     # Body (content to send)
 
     # This new contents are written in HTML language
-    body = Path("indexgabi.html").read_text()
+    body = Path("index.html").read_text()
 
     # -- Status line: We respond that everything is ok (200 code)
     status_line = "HTTP/1.1 200 OK\n"

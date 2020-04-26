@@ -12,7 +12,7 @@ def get_resource(path):
     cod = 200
 
     if path == "/":
-        resp = Path("indexgabi.html").read_text()
+        resp = Path("index.html").read_text()
     elif path == "/info/A":
         resp = Path("A.html").read_text()
     elif path == "/info/C":

@@ -29,7 +29,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
         if resource == "/":
             # Read the file
-            contents = Path('indexgabi.html').read_text()
+            contents = Path('index.html').read_text()
             content_type = 'text/html'
             error_code = 200
         elif resource == "/listusers":
