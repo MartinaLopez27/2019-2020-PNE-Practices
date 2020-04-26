@@ -94,6 +94,10 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                     count = count + 1
                     if count == limit:
                         break
+                        
+                contents = contents + '''<a href="/">Main page</a>
+                                                  </body>
+                                                  </html>'''
                 error_code = 200
 
         elif "karyotype" in self.path:
@@ -129,6 +133,8 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
         else:
             contents = Path('Error.html').read_text()
             error_code = 404
+
+
 
         # -- Generating the response message
         self.send_response(error_code)  # -- Status line: OK!
