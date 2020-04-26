@@ -1,9 +1,11 @@
 Test report - Martina López
 ====================
 
+# --- BASIC LEVEL
+
 ---> listSpecies endpoint
 
-* TEST 1:
+### TEST 1: ###
 
 * Input:
     http://localhost:8080/listSpecies?limit=3
@@ -11,7 +13,6 @@ Test report - Martina López
 * Output:
     <!DOCTYPE html>
     <html lang = "en">
-    <head>
         <meta charset = "utf-8">
     <body style="background-color: paleturquoise;">
     <body>
@@ -31,7 +32,7 @@ Test report - Martina López
     </html>
 
 
-* TEST 2:
+### TEST 2: ###
 
 * Input:
     http://localhost:8080/listSpecies?limit=6
@@ -39,25 +40,228 @@ Test report - Martina López
 * Output:
     <!DOCTYPE html>
     <html lang = "en">
-    <head>
-    <meta charset = "utf-8">
+        <meta charset = "utf-8">
     <body style="background-color: paleturquoise;">
     <body>
-     The total number of species in the ensembl is: 267<br>
-     The limit you have selected is: 6<br>
-     The name of the species are: <br> <ul class="a">
-                <li>Sailfin molly</li>
-                </ul>  <ul class="a">
-                <li>Japanese medaka HSOK</li>
-                </ul>  <ul class="a">
-                <li>Black snub-nosed monkey</li>
-                </ul>  <ul class="a">
-                <li>Golden Hamster</li>
-                </ul>  <ul class="a">
-                <li>Periophthalmus magnuspinnatus</li>
-                </ul>  <ul class="a">
-                <li>Western mosquitofish</li>
-                </ul>
+         The total number of species in the ensembl is: 267<br>
+         The limit you have selected is: 6<br>
+         The name of the species are: <br> <ul class="a">
+                    <li>Sailfin molly</li>
+                    </ul>  <ul class="a">
+                    <li>Japanese medaka HSOK</li>
+                    </ul>  <ul class="a">
+                    <li>Black snub-nosed monkey</li>
+                    </ul>  <ul class="a">
+                    <li>Golden Hamster</li>
+                    </ul>  <ul class="a">
+                    <li>Periophthalmus magnuspinnatus</li>
+                    </ul>  <ul class="a">
+                    <li>Western mosquitofish</li>
+                    </ul>
     <a href="/">Main page</a>
     </body>
     </html>
+
+
+### TEST 3: ###
+
+* Input:
+    http://localhost:8080/listSpecies?limit=333
+
+* Output:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>ERROR</title>
+    </head>
+    <body style="background-color: red;">
+        <h1>ERROR</h1>
+        <p>Resource not available</p>
+        <p>The data you have entered does not exist in the ensembl<p>
+        <p>Try again!</p>
+    </body>
+    </html>
+
+
+### TEST 4: ###
+
+* Input:
+    http://localhost:8080/listSpecies?limit=
+
+* Output:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>ERROR</title>
+    </head>
+    <body style="background-color: red;">
+        <h1>ERROR</h1>
+        <p>Resource not available</p>
+        <p>The data you have entered does not exist in the ensembl<p>
+        <p>Try again!</p>
+    </body>
+    </html>
+______________________________________________________________________________
+    
+---> karyotype endpoint
+
+### TEST 1: ###
+
+* Input:
+    http://localhost:8080/karyotype?specie=rabbit
+
+* Output:
+    <!DOCTYPE html>
+    <html lang = "en">
+        <meta charset = "utf-8">
+    <body style="background-color: paleturquoise;">
+    <body>
+        The names of the chromosomes are:<br>  <li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li><li>8</li><li>9</li><li>10</li><li>11</li><li>12</li><li>13</li><li>14</li><li>15</li><li>16</li><li>17</li><li>18</li><li>19</li><li>20</li><li>21</li><li>X</li><li>MT</li><li>MT</li><li>MT</li>
+    <a href="/">Main page</a>
+    </body>
+    </html>
+
+
+### TEST 2: ###
+
+* Input:
+    http://localhost:8080/karyotype?specie=cat
+
+* Output:
+    <!DOCTYPE html>
+    <html lang = "en">
+        <meta charset = "utf-8">
+    <body style="background-color: paleturquoise;">
+    <body>
+        The names of the chromosomes are:<li>A1</li><li>A2</li><li>A3</li><li>B1</li><li>B2</li><li>B3</li><li>B4</li><li>C1</li><li>C2</li><li>D1</li><li>D2</li><li>D3</li><li>D4</li><li>E1</li><li>E2</li><li>E3</li><li>F1</li><li>F2</li><li>X</li><li>MT</li>
+    <a href="/">Main page</a>
+    </body>
+    </html>
+
+
+### TEST 3: ###
+
+* Input:
+    http://localhost:8080/karyotype?specie=lamds
+
+* Output:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>ERROR</title>
+    </head>
+    <body style="background-color: red;">
+        <h1>ERROR</h1>
+        <p>Resource not available</p>
+        <p>The data you have entered does not exist in the ensembl<p>
+        <p>Try again!</p>
+    </body>
+    </html>
+
+
+### TEST 4: ###
+
+* Input:
+    http://localhost:8080/karyotype?specie=99yy
+
+* Output:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>ERROR</title>
+    </head>
+    <body style="background-color: red;">
+        <h1>ERROR</h1>
+        <p>Resource not available</p>
+        <p>The data you have entered does not exist in the ensembl<p>
+        <p>Try again!</p>
+    </body>
+    </html>
+______________________________________________________________________________
+    
+---> chromosomeLength endpoint
+
+### TEST 1: ###
+
+* Input:
+    http://localhost:8080/chromosomeLength?specie=horse&chromo=8
+
+* Output:
+    <!DOCTYPE html>
+    <html lang = "en">
+        <meta charset = "utf-8">
+    <body style="background-color: paleturquoise;">
+    <body>
+        The length of the chromosome 8 of the specie horse is: 97563019 <br>
+    <a href="/">Main page</a>
+    </body>
+    </html>
+
+
+### TEST 2: ###
+
+* Input:
+    http://localhost:8080/chromosomeLength?specie=human&chromo=X
+
+* Output:
+    <!DOCTYPE html>
+    <html lang = "en">
+        <meta charset = "utf-8">
+    <body style="background-color: paleturquoise;">
+    <body>
+        The length of the chromosome X of the specie human is: 156040895 <br>
+    <a href="/">Main page</a>
+    </body>
+    </html>
+
+
+### TEST 3: ###
+
+* Input:
+    http://localhost:8080/chromosomeLength?specie=mouse&chromo=234x
+
+* Output:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>ERROR</title>
+    </head>
+    <body style="background-color: red;">
+        <h1>ERROR</h1>
+        <p>Resource not available</p>
+        <p>The data you have entered does not exist in the ensembl<p>
+        <p>Try again!</p>
+    </body>
+    </html>
+
+
+### TEST 4: ###
+
+* Input:
+    http://localhost:8080/chromosomeLength?specie=cow&chromo=304
+
+* Output:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>ERROR</title>
+    </head>
+    <body style="background-color: red;">
+        <h1>ERROR</h1>
+        <p>Resource not available</p>
+        <p>The data you have entered does not exist in the ensembl<p>
+        <p>Try again!</p>
+    </body>
+    </html>
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+# --- MEDIUM LEVEL
+
+
