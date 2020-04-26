@@ -9,7 +9,7 @@ PORT = 8080  # -- Define the Server's port
 socketserver.TCPServer.allow_reuse_address = True  # -- This is for preventing the error: "Port already in use"
 
 
-def get_json(server, endpoint, parameters):  # -- Function that access information contained in json files on the Ensembl API
+def get_json(server, endpoint, parameters):  # -- Access information contained in json files on the Ensembl API
 
     if 'specie' in parameters.keys():
         specie = parameters['specie']
@@ -43,7 +43,7 @@ def get_json(server, endpoint, parameters):  # -- Function that access informati
 
 class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritates all his methods and properties
 
-    def get_arguments(self, path):  # -- Split the path to get the arguments, returns a dicctionary
+    def get_arguments(self):  # -- Split the path to get the arguments, returns a dicctionary
         dicctionary = dict()
         if '?' in self.path:
             dicc = self.path.split("?")[1]
@@ -59,7 +59,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
     def do_GET(self):
         server = "http://rest.ensembl.org"
         termcolor.cprint(self.requestline, 'green')  # -- Print the request line
-        parameters = self.get_arguments(self.path)
+        parameters = self.get_arguments()
         error_code = 200
 
         if self.path == "/":
