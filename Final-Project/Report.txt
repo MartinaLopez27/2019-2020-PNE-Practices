@@ -1,0 +1,63 @@
+Test report - Martina López
+====================
+
+---> listSpecies endpoint
+
+* TEST 1:
+
+* Input:
+    http://localhost:8080/listSpecies?limit=3
+
+* Output:
+    <!DOCTYPE html>
+    <html lang = "en">
+    <head>
+        <meta charset = "utf-8">
+    <body style="background-color: paleturquoise;">
+    <body>
+        The total number of species in the ensembl is: 267<br>
+        The limit you have selected is: 4<br>
+        The name of the species are: <br> <ul class="a">
+                <li>Sailfin molly</li>
+                </ul>  <ul class="a">
+                <li>Japanese medaka HSOK</li>
+                </ul>  <ul class="a">
+                <li>Black snub-nosed monkey</li>
+                </ul>  <ul class="a">
+                <li>Golden Hamster</li>
+                </ul>
+    <a href="/">Main page</a>
+    </body>
+    </html>
+
+
+* TEST 2:
+
+* Input:
+    http://localhost:8080/listSpecies?limit=6
+
+* Output:
+    <!DOCTYPE html>
+    <html lang = "en">
+    <head>
+    <meta charset = "utf-8">
+    <body style="background-color: paleturquoise;">
+    <body>
+     The total number of species in the ensembl is: 267<br>
+     The limit you have selected is: 6<br>
+     The name of the species are: <br> <ul class="a">
+                <li>Sailfin molly</li>
+                </ul>  <ul class="a">
+                <li>Japanese medaka HSOK</li>
+                </ul>  <ul class="a">
+                <li>Black snub-nosed monkey</li>
+                </ul>  <ul class="a">
+                <li>Golden Hamster</li>
+                </ul>  <ul class="a">
+                <li>Periophthalmus magnuspinnatus</li>
+                </ul>  <ul class="a">
+                <li>Western mosquitofish</li>
+                </ul>
+    <a href="/">Main page</a>
+    </body>
+    </html>
