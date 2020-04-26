@@ -55,10 +55,10 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                     dicctionary[key] = value
             return dicctionary
 
-
     def do_GET(self):
         server = "http://rest.ensembl.org"
         termcolor.cprint(self.requestline, 'green')  # -- Print the request line
+        parameters = self.get_arguments(self.path)
 
         if self.path == "/":
             contents = Path("index.html").read_text()
@@ -67,7 +67,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
         # -- BASIC LEVEL
         elif "listSpecies" in self.path:
             endpoint = "/info/species"
-            parameters = self.get_arguments(self.path)
+            info_list = get_json(server, endpoint, parameters)
 
             if 'limit' in parameters:  # -- In case the limit number is not included in the length of the info_list.
                 try:
@@ -77,20 +77,12 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
             else:
                 limit = 0
 
-            info_list = get_json(server, endpoint, parameters)
-
             if 0 < limit <= 267:
-                contents = f'''<!DOCTYPE html>
-                               <html lang = "en">            
-                               <head>  
-                               <meta charset = "utf-8">
-                                    <title> LIST OF SPECIES </title>
-                                     </head>
-                                     <body style="background-color: lightblue;">       
-                                     <p>The total number of species in the ensembl is: {len(info_list)}</p>
-                                     <p>The limit you have selected is: {limit}</p>
-                                    <p>The name of the species are: </p>
-                               '''
+                contents = f''' <body style="background-color: lightblue;">       
+                                 <p>The total number of species in the ensembl is: {len(info_list)}</p>
+                                 <p>The limit you have selected is: {limit}</p>
+                                 <p>The name of the species are: </p>'''
+
 
                 count = 0
                 for element in info_list:
@@ -106,43 +98,37 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
 
         elif "karyotype" in self.path:
             endpoint = "/info/assembly/"
-            parameters = self.get_arguments(self.path)
+            info_list = get_json(server, endpoint, parameters)
 
-            if 'specie' in parameters and parameters['specie'] != '':
-                try:
-                    info_list = get_json(server, endpoint, parameters)
+            contents = ''' <body style="background-color: lightblue;">    
+                            <p>The names of the chromosomes are:</p>  '''
 
-                    contents =  f'''<!DOCTYPE html>
-                                   <html lang = "en">            
-                                   <head>  
-                                   <meta charset = "utf-8"
-                                         <title>The names of the chromosomes are:</title>
-                                         </head>
-                                         <body style="background-color: lightblue;">       
-                                    '''
-                    
-                    for element in info_list:
-                        contents = contents + '<li>' + element + '</li>'
+            for element in info_list:
+                contents = contents + '<li>' + element + '</li>'
 
-                    contents = contents + '''<a href="/">Main page</a>
-                                          </body>
-                                          </html>'''
-                    error_code = 200
-                    
-                except KeyError:
-                    contents = Path('Error.html').read_text()
-                    error_code = 404
+            contents = contents + '''<a href="/">Main page</a>
+                                  </body>
+                                  </html>'''
+            error_code = 200
+
+        elif "chromosomeLength" in self.path:
+            endpoint = "/info/assembly/"
+            info_list = get_json(server, endpoint, parameters)
+
+            if 'length' in info_list.keys():
+                contents = f"""<body style="background-color: lightblue;">
+                            <p>The length of the chromosome {parameters['chromo']} 
+                            of the specie {parameters['specie']}
+                            is: {info_list['length']} </p>"""
             else:
                 contents = Path('Error.html').read_text()
                 error_code = 404
 
-        
+            error_code = 200
 
-                
         else:
             contents = Path('Error.html').read_text()
             error_code = 404
-
 
         # -- Generating the response message
         self.send_response(error_code)  # -- Status line: OK!
