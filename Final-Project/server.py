@@ -9,7 +9,8 @@ PORT = 8080  # -- Define the Server's port
 socketserver.TCPServer.allow_reuse_address = True  # -- This is for preventing the error: "Port already in use"
 
 
-def get_json(server, endpoint, parameters):
+def get_json(server, endpoint, parameters):  # -- Function that access information contained in json files on the Ensembl API
+
     if 'specie' in parameters.keys():
         specie = parameters['specie']
         try:
@@ -59,79 +60,88 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
         server = "http://rest.ensembl.org"
         termcolor.cprint(self.requestline, 'green')  # -- Print the request line
         parameters = self.get_arguments(self.path)
+        error_code = 200
 
         if self.path == "/":
             contents = Path("index.html").read_text()
-            error_code = 200
 
         # -- BASIC LEVEL
         elif "listSpecies" in self.path:
             endpoint = "/info/species"
             info_list = get_json(server, endpoint, parameters)
 
-            if 'limit' in parameters:  # -- In case the limit number is not included in the length of the info_list.
-                try:
-                    limit = int(parameters['limit'])  # -- Convert the limit into integer value as it was a string.
-                except:
-                    limit = 0
-            else:
-                limit = 0
+            try:
+                limit = int(parameters['limit'])
+                if 0 < limit <= 267:
+                    contents = f''' <!DOCTYPE html>
+                                    <html lang = "en">            
+                                    <meta charset = "utf-8">
+                                    <body style="background-color: paleturquoise;">
+                                    <body>
+                                     The total number of species in the ensembl is: {len(info_list)}<br>
+                                     The limit you have selected is: {limit}<br>
+                                     The name of the species are: <br>'''
 
-            if 0 < limit <= 267:
-                contents = f''' <body style="background-color: lightblue;">       
-                                 <p>The total number of species in the ensembl is: {len(info_list)}</p>
-                                 <p>The limit you have selected is: {limit}</p>
-                                 <p>The name of the species are: </p>'''
-
-                count = 0
-                for element in info_list:
-                    contents = contents + f'''<!DOCTYPE html> 
-                                                <ul class="a">
+                    count = 0
+                    for element in info_list:
+                        contents = contents + f''' <ul class="a">
                                                 <li>{element['display_name']}</li>
-                                                </ul>
-                                                '''
-                    count = count + 1
-                    if count == limit:
-                        break
+                                                </ul> '''
 
-                contents = contents + '''<a href="/">Main page</a>
-                                                  </body>
-                                                  </html>'''
-                error_code = 200
+                        count = count + 1
+                        if count == limit:
+                            break
+
+                    contents = contents + '''<a href="/">Main page</a>
+                                            </body>
+                                            </html>'''
+            except ValueError:
+                contents = Path('Error.html').read_text()
+                error_code = 404
 
         elif "karyotype" in self.path:
             endpoint = "/info/assembly/"
             info_list = get_json(server, endpoint, parameters)
 
-            contents = ''' <body style="background-color: lightblue;">    
-                            <p>The names of the chromosomes are:</p>  '''
+            contents = '''  <!DOCTYPE html>
+                            <html lang = "en">             
+                            <meta charset = "utf-8">
+                            <body style="background-color: paleturquoise;">
+                            <body>   
+                              The names of the chromosomes are:'''
 
             for element in info_list:
                 contents = contents + '<li>' + element + '</li>'
 
             contents = contents + '''<a href="/">Main page</a>
-                                  </body>
-                                  </html>'''
-            error_code = 200
+                                        </body>
+                                        </html>'''
 
         elif "chromosomeLength" in self.path:
             endpoint = "/info/assembly/"
             info_list = get_json(server, endpoint, parameters)
 
             if 'length' in info_list.keys():
-                contents = f"""<body style="background-color: lightblue;">
-                            <p>The length of the chromosome {parameters['chromo']} 
-                            of the specie {parameters['specie']}
-                            is: {info_list['length']} </p>"""
+                contents = f''' <!DOCTYPE html>
+                                <html lang = "en">            
+                                    <meta charset = "utf-8">
+                                <body style="background-color: paleturquoise;">
+                                <body>
+                                    The length of the chromosome {parameters['chromo']} of the specie {parameters['specie']} is: {info_list['length']} <br>'''
+
+                contents = contents + '''<a href="/">Main page</a>
+                                        </body>
+                                        </html>'''
             else:
                 contents = Path('Error.html').read_text()
                 error_code = 404
 
-            error_code = 200
 
         else:
             contents = Path('Error.html').read_text()
             error_code = 404
+
+
 
         # -- Generating the response message
         self.send_response(error_code)  # -- Status line: OK!
