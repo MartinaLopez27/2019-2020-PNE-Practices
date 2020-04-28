@@ -8,68 +8,63 @@ Test report - Martina López
 
 * Output:
     <!DOCTYPE html>
-        <html lang="en" dir="ltr">
-          <head>
-            <meta charset="utf-8">
-            <title>FINAL PROJECT</title>
-          </head>
-          <body style="background-color: Lavender;">
-            <font face="cambria" size = 4 color = "black">
+    <html lang="en" dir="ltr">
+      <head>
+        <meta charset="utf-8">
+        <title>FINAL PROJECT</title>
+      </head>
+      <body style="background-color: Lavender;">
+        <font face="cambria" size = 4 color = "black">
 
-              <h1>Browsing Human and Vertebrates genome</h1>
-              <h2>BASIC Level Services</h2>
+          <h1>Browsing Human and Vertebrates genome</h1>
+          <h2>BASIC Level Services</h2><br>
 
+        <p>1)List of species in the genome database</p>
+        <form action="/listSpecies" method="get">
+            </p>Limit: <input type="number" name="limit" min="1" max="267"></p>
+            <p><button type="submit">Send</button></p><br>
+        </form>
 
-            <p>1)List of species in the genome database</p>
-            <form action="/listSpecies" method="get">
-                </p>Limit: <input type="number" name="limit" min="1" max="267"></p>
-                <p><button type="submit">Send</button></p>
-            </form>
+        <p>2)Information about the karyotype:</p>
+        <form action="/karyotype" method="get">
+            </p>Select the species: <input type="text" name="specie"></p>
+            <p><button type="submit">Send</button></p><br>
+        </form>
 
+         <p>3)Chromosome Length</p>
+        <form action="/chromosomeLength" method="get">
+            </p>Select the species: <input type="text" name="specie"></p>
+            </p>Select a chromosome: <input type="text" name="chromo"></p>
+            <p><button type="submit">Send</button></p><br>
+        </form>
 
-            <p>2)Information about the karyotype:</p>
-            <form action="/karyotype" method="get">
-                </p>Select the species: <input type="text" name="specie"></p>
-                <p><button type="submit">Send</button></p>
-            </form>
+        <p>4)Sequence of a given human gene</p>
+        <form action="/geneSeq" method="get">
+            <p>Introduce the name of a gene: <input type="text" name="gene"></p>
+            <p><button type="submit">Send</button></p><br>
+        </form>
 
+        <p>5)Information about a human gene</p>
+        <form action="/geneInfo" method="get">
+            <p>Introduce the name of a gene: <input type="text" name="gene"></p>
+            <p><button type="submit">Send</button></p><br>
+        </form>
 
-             <p>3)Chromosome Length</p>
-            <form action="/chromosomeLength" method="get">
-                </p>Select the species: <input type="text" name="specie"></p>
-                </p>Select a chromosome: <input type="text" name="chromo"></p>
-                <p><button type="submit">Send</button></p>
-            </form>
+        <p>6)Calculations on the given human gene</p>
+        <form action="/geneCalc" method="get">
+            <p>Introduce the name of a gene: <input type="text" name="gene"></p>
+            <p><button type="submit">Send</button></p><br>
+        </form>
 
-            <p>4)Sequence of a given human gene</p>
-            <form action="/geneSeq" method="get">
-                <p>Introduce the name of a gene: <input type="text" name="gene"></p>
-                <p><button type="submit">Send</button></p>
-            </form>
-
-
-            <p>5)Information about a human gene</p>
-            <form action="/geneInfo" method="get">
-                <p>Introduce the name of a gene: <input type="text" name="gene"></p>
-                <p><button type="submit">Send</button></p>
-            </form>
-
-            <p>6)Calculations on the given human gene</p>
-            <form action="/geneCalc" method="get">
-                <p>Introduce the name of a gene: <input type="text" name="gene"></p>
-                <p><button type="submit">Send</button></p>
-            </form>
-
-            <p>7)Names of the genes located in the chromosome from the start to end positions</p>
-            <form action="/geneList" method="get">
-                <p>Introduce the name of a chromosome: <input type="text" name="chromo"></p>
-                <p>Introduce the start position: <input type="number" name="start" min="0"></p>
-                <p>Introduce the end position: <input type="number" name="end" min="0"></p>
-                <p><button type="submit">Send</button></p>
-            </form>
-        </body>
+        <p>7)Names of the genes located in the chromosome from the start to end positions</p>
+        <form action="/geneList" method="get">
+            <p>Introduce the name of a chromosome: <input type="text" name="chromo"></p>
+            <p>Introduce the start position: <input type="number" name="start" min="0"></p>
+            <p>Introduce the end position: <input type="number" name="end" min="0"></p>
+            <p><button type="submit">Send</button></p><br>
+        </form>
+      </body>
     </html>
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -77,7 +72,7 @@ Test report - Martina López
 
 ---> listSpecies endpoint
 
-### TEST 1: ###
+### TEST 1: ###  (List species with limit 3)
 
 * Input:
     http://localhost:8080/listSpecies?limit=3
@@ -85,7 +80,10 @@ Test report - Martina López
 * Output:
     <!DOCTYPE html>
     <html lang = "en">
-        <meta charset = "utf-8">
+    <head>
+        <meta charset="UTF-8">
+        <title>LIST OF SPECIES IN THE BROWSER</title>
+    </head>
     <body style="background-color: paleturquoise;">
     <body>
         The total number of species in the ensembl is: 267<br>
@@ -104,7 +102,7 @@ Test report - Martina López
     </html>
 
 
-### TEST 2: ###
+### TEST 2: ###  (List species with limit 6)
 
 * Input:
     http://localhost:8080/listSpecies?limit=6
@@ -112,7 +110,10 @@ Test report - Martina López
 * Output:
     <!DOCTYPE html>
     <html lang = "en">
-        <meta charset = "utf-8">
+    <head>
+        <meta charset="UTF-8">
+        <title>LIST OF SPECIES IN THE BROWSER</title>
+    </head>
     <body style="background-color: paleturquoise;">
     <body>
          The total number of species in the ensembl is: 267<br>
@@ -135,7 +136,7 @@ Test report - Martina López
     </html>
 
 
-### TEST 3: ###
+### TEST 3: ###  (The limit 333 is out of the index, so the error page is returned)
 
 * Input:
     http://localhost:8080/listSpecies?limit=333
@@ -156,7 +157,7 @@ Test report - Martina López
     </html>
 
 
-### TEST 4: ###
+### TEST 4: ###  (The user didn´t introduce any limit, so the error page is returned)
 
 * Input:
     http://localhost:8080/listSpecies?limit=
@@ -179,7 +180,7 @@ ______________________________________________________________________________
     
 ---> karyotype endpoint
 
-### TEST 1: ###
+### TEST 1: ###  (Karyotype infromation of the specie: rabbit)
 
 * Input:
     http://localhost:8080/karyotype?specie=rabbit
@@ -187,7 +188,10 @@ ______________________________________________________________________________
 * Output:
     <!DOCTYPE html>
     <html lang = "en">
-        <meta charset = "utf-8">
+    <head>
+        <meta charset="UTF-8">
+        <title>KARYOTYPE INFORMATION OF A SPECIE</title>
+    </head>
     <body style="background-color: paleturquoise;">
     <body>
         The names of the chromosomes are:<br>  <li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li><li>8</li><li>9</li><li>10</li><li>11</li><li>12</li><li>13</li><li>14</li><li>15</li><li>16</li><li>17</li><li>18</li><li>19</li><li>20</li><li>21</li><li>X</li><li>MT</li><li>MT</li><li>MT</li>
@@ -196,7 +200,7 @@ ______________________________________________________________________________
     </html>
 
 
-### TEST 2: ###
+### TEST 2: ###  (Karyotype infromation of the specie: cat)
 
 * Input:
     http://localhost:8080/karyotype?specie=cat
@@ -204,7 +208,10 @@ ______________________________________________________________________________
 * Output:
     <!DOCTYPE html>
     <html lang = "en">
-        <meta charset = "utf-8">
+    <head>
+        <meta charset="UTF-8">
+        <title>KARYOTYPE INFORMATION OF A SPECIE</title>
+    </head>
     <body style="background-color: paleturquoise;">
     <body>
         The names of the chromosomes are:<li>A1</li><li>A2</li><li>A3</li><li>B1</li><li>B2</li><li>B3</li><li>B4</li><li>C1</li><li>C2</li><li>D1</li><li>D2</li><li>D3</li><li>D4</li><li>E1</li><li>E2</li><li>E3</li><li>F1</li><li>F2</li><li>X</li><li>MT</li>
@@ -213,7 +220,7 @@ ______________________________________________________________________________
     </html>
 
 
-### TEST 3: ###
+### TEST 3: ###  (The specie introduced by the user does not exists, so the error page is returned)
 
 * Input:
     http://localhost:8080/karyotype?specie=lamds
@@ -234,10 +241,10 @@ ______________________________________________________________________________
     </html>
 
 
-### TEST 4: ###
+### TEST 4: ###  (The user didn´t introduce any specie, so the error page is returned)
 
 * Input:
-    http://localhost:8080/karyotype?specie=99yy
+    http://localhost:8080/karyotype?specie=
 
 * Output:
     <!DOCTYPE html>
@@ -257,7 +264,7 @@ ______________________________________________________________________________
     
 ---> chromosomeLength endpoint
 
-### TEST 1: ###
+### TEST 1: ###  (Chromosome length of the 8 chromosome of the specie horse)
 
 * Input:
     http://localhost:8080/chromosomeLength?specie=horse&chromo=8
@@ -265,7 +272,10 @@ ______________________________________________________________________________
 * Output:
     <!DOCTYPE html>
     <html lang = "en">
-        <meta charset = "utf-8">
+    <head>
+        <meta charset="UTF-8">
+        <title>CHROMOSOME LENGTH OF A SPECIE</title>
+    </head>
     <body style="background-color: paleturquoise;">
     <body>
         The length of the chromosome 8 of the specie horse is: 97563019 <br>
@@ -274,7 +284,7 @@ ______________________________________________________________________________
     </html>
 
 
-### TEST 2: ###
+### TEST 2: ###  (Chromosome length of the X chromosome of the specie human)
 
 * Input:
     http://localhost:8080/chromosomeLength?specie=human&chromo=X
@@ -282,7 +292,10 @@ ______________________________________________________________________________
 * Output:
     <!DOCTYPE html>
     <html lang = "en">
-        <meta charset = "utf-8">
+    <head>
+        <meta charset="UTF-8">
+        <title>CHROMOSOME LENGTH OF A SPECIE</title>
+    </head>
     <body style="background-color: paleturquoise;">
     <body>
         The length of the chromosome X of the specie human is: 156040895 <br>
@@ -291,7 +304,7 @@ ______________________________________________________________________________
     </html>
 
 
-### TEST 3: ###
+### TEST 3: ###  (The user introduced a valid specie 'mouse', but not a valid chromosome '234x')
 
 * Input:
     http://localhost:8080/chromosomeLength?specie=mouse&chromo=234x
@@ -312,10 +325,31 @@ ______________________________________________________________________________
     </html>
 
 
-### TEST 4: ###
+### TEST 4: ###  (The user didn´t introduce a valid specie: sints, so the error page is returned.)
 
 * Input:
-    http://localhost:8080/chromosomeLength?specie=cow&chromo=304
+    http://localhost:8080/chromosomeLength?specie=sints&chromo=4
+
+* Output:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>ERROR</title>
+    </head>
+    <body style="background-color: red;">
+        <h1>ERROR</h1>
+        <p>Resource not available</p>
+        <p>The data you have entered does not exist in the ensembl<p>
+        <p>Try again!</p>
+    </body>
+    </html>
+
+
+# TEST 5: ###  (The user didn´t introduce any specie or chromosome, so the error page is returned)
+
+* Input:
+    http://localhost:8080/chromosomeLength?specie=&chromo=
 
 * Output:
     <!DOCTYPE html>
@@ -335,3 +369,4 @@ ______________________________________________________________________________
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 # --- MEDIUM LEVEL
+

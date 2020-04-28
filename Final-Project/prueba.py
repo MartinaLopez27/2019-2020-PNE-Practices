@@ -1,5 +1,6 @@
 import http.server
 import socketserver
+import json
 from pathlib import Path
 
 import requests
@@ -75,7 +76,10 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                 if 0 < limit <= 267:
                     contents = f''' <!DOCTYPE html>
                                     <html lang = "en">            
-                                    <meta charset = "utf-8">
+                                    <head>
+                                        <meta charset="UTF-8">
+                                        <title>LIST OF SPECIES IN THE BROWSER</title>
+                                    </head>
                                     <body style="background-color: paleturquoise;">
                                     <body>
                                      The total number of species in the ensembl is: {len(info_list)}<br>
@@ -105,7 +109,10 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
 
             contents = '''  <!DOCTYPE html>
                             <html lang = "en">             
-                            <meta charset = "utf-8">
+                            <head>
+                                <meta charset="UTF-8">
+                                <title>KARYOTYPE INFORMATION OF A SPECIE</title>
+                            </head>
                             <body style="background-color: paleturquoise;">
                             <body>   
                               The names of the chromosomes are:'''
@@ -124,7 +131,10 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
             if 'length' in info_list.keys():
                 contents = f''' <!DOCTYPE html>
                                 <html lang = "en">            
-                                    <meta charset = "utf-8">
+                                <head>
+                                    <meta charset="UTF-8">
+                                    <title>CHROMOSOME LENGTH OF A SPECIE</title>
+                                </head>
                                 <body style="background-color: paleturquoise;">
                                 <body>
                                     The length of the chromosome {parameters['chromo']} of the specie {parameters['specie']} is: {info_list['length']} <br>'''
@@ -136,12 +146,104 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                 contents = Path('Error.html').read_text()
                 error_code = 404
 
+        elif "/geneSeq" in self.path:
+            try:
+                gene_id = parameters["gene"]
+
+                conn = http.client.HTTPConnection('rest.ensembl.org')
+                conn.request("GET", "/homology/symbol/human/" + gene_id + "?content-type=application/json")
+                r1 = conn.getresponse()
+                data1 = r1.read().decode('utf-8')
+                response = json.loads(data1)
+
+                id_name = response['data'][0]['id']
+                conn.request('GET', '/sequence/id/' + id_name + '?content-type=application/json')
+                r1 = conn.getresponse()
+                data1 = r1.read().decode('utf-8')
+                response = json.loads(data1)
+
+                DNA_sequence = response['seq']
+
+                # Dict = {}  #para el json
+                # Dict['DNAsequence'] = response['seq']
+
+                contents = f""" <!DOCTYPE html>
+                                <html lang="en">
+                                <head>
+                                    <meta charset="UTF-8">
+                                    <title>SEQUENCE OF A HUMAN GENE</title>
+                                </head>
+                                <body style ="background-color: palegoldenrod;">
+                                <body>
+                                    The sequence of the human gene {gene_id} is:<br>
+                                """
+
+                contents = contents + "<li>" + DNA_sequence + "<li>"
+
+                contents = contents + '''<a href="/">Main page</a>
+                                        </body>
+                                        </html>'''
+            except KeyError:
+                contents = Path('Error.html').read_text()
+                error_code = 404
+
+        elif "geneInfo" in self.path:
+            try:
+                gene_id = parameters["gene"]
+
+                conn = http.client.HTTPConnection('rest.ensembl.org')
+                conn.request("GET", "/homology/symbol/human/" + gene_id + "?content-type=application/json")
+                r1 = conn.getresponse()
+                data1 = r1.read().decode('utf-8')
+                response = json.loads(data1)
+
+                id_name = response['data'][0]['id']
+                conn.request('GET', '/overlap/id/' + id_name + '?feature=gene;content-type=application/json')
+                r1 = conn.getresponse()
+                data1 = r1.read().decode('utf-8')
+                response = json.loads(data1)
+
+                start = response[0]['start']
+                end = response[0]['end']
+                id = response[0]['id']
+                lenght = end - start
+                chromosome = response[0]['assembly_name']
+
+                contents = f""" <!DOCTYPE html>
+                                <html lang="en">
+                                <head>
+                                    <meta charset="UTF-8">
+                                    <title>INFORMATION OF A HUMAN GENE</title>
+                                </head>
+                                <body style ="background-color: palegoldenrod;">
+                                <body>
+                                    The information available about the gene {gene_id} is:<br>
+                                    """
+
+                contents = contents + "<h4>Id:</h4>" "<li>" + id + "</li>"
+                contents = contents + "<h4>Start:</h4>" "<li>" + str(start) + "</li>"
+                contents = contents + "<h4>End:</h4>" "<li>" + str(end) + "</li>"
+                contents = contents + "<h4>Lenght:</h4>" "<li>" + str(lenght) + "</li>"
+                contents = contents + "<h4>Chromosome:</h4>""<li>" + chromosome + "</li><br>"
+
+                contents = contents + '''<a href="/">Main page</a>
+                                                    </body>
+                                                    </html>'''
+            except KeyError:
+                contents = Path('Error.html').read_text()
+                error_code = 404
+
+
+
+
+
+
+
+
 
         else:
             contents = Path('Error.html').read_text()
             error_code = 404
-
-
 
         # -- Generating the response message
         self.send_response(error_code)  # -- Status line: OK!
