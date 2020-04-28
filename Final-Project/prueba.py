@@ -1,4 +1,5 @@
 import http.server
+import http.client
 import socketserver
 import json
 from pathlib import Path
@@ -89,7 +90,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                     count = 0
                     for element in info_list:
                         contents = contents + f''' <ul class="a">
-                                                <li>{element['display_name']}</li>
+                                                <li>{element["display_name"]}</li>
                                                 </ul> '''
 
                         count = count + 1
@@ -137,7 +138,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                                 </head>
                                 <body style="background-color: paleturquoise;">
                                 <body>
-                                    The length of the chromosome {parameters['chromo']} of the specie {parameters['specie']} is: {info_list['length']} <br>'''
+                                    The length of the chromosome {parameters['chromo']} of the specie {parameters['specie']} is: {info_list['length']}<br>'''
 
                 contents = contents + '''<a href="/">Main page</a>
                                         </body>
@@ -220,11 +221,11 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                                     The information available about the gene {gene_id} is:<br>
                                     """
 
-                contents = contents + "<h4>Id:</h4>" "<li>" + id + "</li>"
-                contents = contents + "<h4>Start:</h4>" "<li>" + str(start) + "</li>"
-                contents = contents + "<h4>End:</h4>" "<li>" + str(end) + "</li>"
-                contents = contents + "<h4>Lenght:</h4>" "<li>" + str(lenght) + "</li>"
-                contents = contents + "<h4>Chromosome:</h4>""<li>" + chromosome + "</li><br>"
+                contents = contents + "<h4>The Id of the gene is:</h4>" "<li>" + id + "</li>"
+                contents = contents + "<h4>The gene start on position:</h4>" "<li>" + str(start) + "</li>"
+                contents = contents + "<h4>The gene ends on position:</h4>" "<li>" + str(end) + "</li>"
+                contents = contents + "<h4>The length of the gene is:</h4>" "<li>" + str(lenght) + "</li>"
+                contents = contents + "<h4>The gene is on chromosome:</h4>""<li>" + chromosome + "</li><br>"
 
                 contents = contents + '''<a href="/">Main page</a>
                                                     </body>
