@@ -3,6 +3,7 @@ import http.client
 import socketserver
 import json
 from pathlib import Path
+from Seq import Seq
 
 import requests
 import termcolor
@@ -92,7 +93,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                         contents = contents + f''' <ul class="a">
                                                 <li>{element["display_name"]}</li>
                                                 </ul> '''
-
                         count = count + 1
                         if count == limit:
                             break
@@ -149,7 +149,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
 
         elif "/geneSeq" in self.path:
             try:
-                gene_id = parameters["gene"]
+                gene_id = parameters['gene']
 
                 conn = http.client.HTTPConnection('rest.ensembl.org')
                 conn.request("GET", "/homology/symbol/human/" + gene_id + "?content-type=application/json")
@@ -168,7 +168,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                 # Dict = {}  #para el json
                 # Dict['DNAsequence'] = response['seq']
 
-                contents = f""" <!DOCTYPE html>
+                contents = f'''<!DOCTYPE html>
                                 <html lang="en">
                                 <head>
                                     <meta charset="UTF-8">
@@ -176,10 +176,9 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                                 </head>
                                 <body style ="background-color: palegoldenrod;">
                                 <body>
-                                    The sequence of the human gene {gene_id} is:<br>
-                                """
+                                    The sequence of the human gene {gene_id} is:<br> '''
 
-                contents = contents + "<li>" + DNA_sequence + "<li>"
+                contents = contents + '<li>' + DNA_sequence + '<li>'
 
                 contents = contents + '''<a href="/">Main page</a>
                                         </body>
@@ -190,7 +189,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
 
         elif "geneInfo" in self.path:
             try:
-                gene_id = parameters["gene"]
+                gene_id = parameters['gene']
 
                 conn = http.client.HTTPConnection('rest.ensembl.org')
                 conn.request("GET", "/homology/symbol/human/" + gene_id + "?content-type=application/json")
@@ -210,7 +209,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                 lenght = end - start
                 chromosome = response[0]['assembly_name']
 
-                contents = f""" <!DOCTYPE html>
+                contents = f'''<!DOCTYPE html>
                                 <html lang="en">
                                 <head>
                                     <meta charset="UTF-8">
@@ -218,14 +217,13 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                                 </head>
                                 <body style ="background-color: palegoldenrod;">
                                 <body>
-                                    The information available about the gene {gene_id} is:<br>
-                                    """
+                                    The information available about the gene {gene_id} is:<br>'''
 
-                contents = contents + "<h4>The Id of the gene is:</h4>" "<li>" + id + "</li>"
-                contents = contents + "<h4>The gene start on position:</h4>" "<li>" + str(start) + "</li>"
-                contents = contents + "<h4>The gene ends on position:</h4>" "<li>" + str(end) + "</li>"
-                contents = contents + "<h4>The length of the gene is:</h4>" "<li>" + str(lenght) + "</li>"
-                contents = contents + "<h4>The gene is on chromosome:</h4>""<li>" + chromosome + "</li><br>"
+                contents = contents + '<h4>The Id of the gene is:</h4><li>' + id + '</li>'
+                contents = contents + '<h4>The gene start on position:</h4><li>' + str(start) + '</li>'
+                contents = contents + '<h4>The gene ends on position:</h4><li>' + str(end) + '</li>'
+                contents = contents + '<h4>The length of the gene is:</h4><li>' + str(lenght) + '</li>'
+                contents = contents + '<h4>The gene is on chromosome:</h4><li>' + chromosome + '</li><br>'
 
                 contents = contents + '''<a href="/">Main page</a>
                                                     </body>
@@ -234,8 +232,93 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                 contents = Path('Error.html').read_text()
                 error_code = 404
 
+        elif "geneCal" in self.path:
+            try:
+                gene_id = parameters['gene']
 
+                conn = http.client.HTTPConnection('rest.ensembl.org')
+                conn.request("GET", "/homology/symbol/human/" + gene_id + "?content-type=application/json")
+                r1 = conn.getresponse()
+                data1 = r1.read().decode('utf-8')
+                response = json.loads(data1)
 
+                id_name = response['data'][0]['id']
+                conn.request("GET", "/sequence/id/" + id_name + "?content-type=application/json")
+                r1 = conn.getresponse()
+                text_json = r1.read().decode("utf-8")
+                response = json.loads(text_json)
+
+                seq_string = response['seq']
+
+                print("Sequence: " + seq_string)
+                s1 = Seq(seq_string)
+                total = len(seq_string)
+                perc_A = s1.perc('A')
+                perc_T = s1.perc('T')
+                perc_G = s1.perc('G')
+                perc_C = s1.perc('C')
+
+                contents = f'''<!DOCTYPE html>
+                                <html lang="en">
+                                <head>
+                                    <meta charset="UTF-8">
+                                    <title>CALCULATIONS OF A HUMAN GENE</title>
+                                </head>
+                                <body style ="background-color: palegoldenrod;">
+                                <body>
+                                    The calculations available about the gene {gene_id} are:<br>'''
+
+                contents = contents + '<h4>The total lenght is:</h4><li>' + str(total) + '</li>'
+                contents = contents + '<h4>The percentage of base A is:</h4><li>' + str(perc_A) + '</li>'
+                contents = contents + '<h4>The percentage of base T is:</h4><li>' + str(perc_T) + '</li>'
+                contents = contents + '<h4>The percentage of base G is:</h4><li>' + str(perc_G) + '</li>'
+                contents = contents + '<h4>The percentage of base C is:</h4><li>' + str(perc_C) + '</li><br>'
+
+                contents = contents + '''<a href="/">Main page</a>
+                                                    </body>
+                                                    </html>'''
+            except KeyError:
+                contents = Path('Error.html').read_text()
+                error_code = 404
+
+        elif "geneList" in self.path:
+            try:
+                chromosome = parameters['chromo']
+                start = parameters['start']
+                end = parameters['end']
+
+                conn = http.client.HTTPConnection('rest.ensembl.org')
+                conn.request("GET", "/overlap/region/human/" + str(chromosome) + ":" + str(start) + "-" + str(
+                    end) + "?content-type=application/json;feature=gene")
+                r1 = conn.getresponse()
+                data1 = r1.read().decode("utf-8")
+                response = json.loads(data1)
+
+                finish = int(end) - int(start)
+
+                contents = f'''<!DOCTYPE html>
+                                <html lang="en">
+                                <head>
+                                    <meta charset="UTF-8">
+                                    <title>GENE LIST OF CHROMOSOMES</title>
+                                </head>
+                                <body style ="background-color: palegoldenrod;">
+                                <body>
+                                    The gene list of chromosome number {chromosome}, that starts at number {start} and ends at number {end}:<br> '''
+                count = 0
+                for element in response:
+                    if 'feature_type' in element and element['feature_type'] == 'gene':
+                        contents = contents + '<li>' + element['external_name'] + '</li>'
+                        count = count + 1
+                        if count == finish:
+                            break
+
+                contents = contents + '''<a href="/">Main page</a>
+                                                    </body>
+                                                    </html>'''
+            except ValueError:
+                contents = Path('Error.html').read_text()
+                error_code = 404
 
 
 
