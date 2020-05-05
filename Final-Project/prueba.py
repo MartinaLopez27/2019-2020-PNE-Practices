@@ -297,26 +297,41 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
 
                 finish = int(end) - int(start)
 
-                contents = f'''<!DOCTYPE html>
-                                <html lang="en">
-                                <head>
-                                    <meta charset="UTF-8">
-                                    <title>GENE LIST OF CHROMOSOMES</title>
-                                </head>
-                                <body style ="background-color: palegoldenrod;">
-                                <body>
-                                    The gene list of chromosome number {chromosome}, starting at number {start} and ending at number {end} are:<br> '''
-                count = 0
-                for element in response:
-                    if 'feature_type' in element and element['feature_type'] == 'gene':
-                        contents = contents + '<li>' + element['external_name'] + '</li>'
-                        count = count + 1
-                        if count == finish:
-                            break
+                if json_1 in parameters:
+                    json_1 = True
+                    gene_list = []
+                    count = 0
+                    for element in response:
+                        if 'feature_type' in element and element['feature_type'] == 'gene':
+                            gene_list.append(element['external_name'])
+                            count = count + 1
+                            if count == finish:
+                                break
+                        dic = dict()
+                        dic['Gene'] = gene_list
+                        contents = json.dumps(dic)
 
-                contents = contents + '''<a href="/">Main page</a>
-                                                    </body>
-                                                    </html>'''
+                else:
+                    contents = f'''<!DOCTYPE html>
+                                    <html lang="en">
+                                    <head>
+                                        <meta charset="UTF-8">
+                                        <title>GENE LIST OF CHROMOSOMES</title>
+                                    </head>
+                                    <body style ="background-color: palegoldenrod;">
+                                    <body>
+                                        The gene list of chromosome number {chromosome}, starting at number {start} and ending at number {end} are:<br> '''
+                    count = 0
+                    for element in response:
+                        if 'feature_type' in element and element['feature_type'] == 'gene':
+                            contents = contents + '<li>' + element['external_name'] + '</li>'
+                            count = count + 1
+                            if count == finish:
+                                break
+
+                    contents = contents + '''<a href="/">Main page</a>
+                                                        </body>
+                                                        </html>'''
             except ValueError:
                 contents = Path('Error.html').read_text()
                 error_code = 404
@@ -325,36 +340,22 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
             contents = Path('Error.html').read_text()
             error_code = 404
 
-        if not json_1:
-            # -- Generating the response message
-            self.send_response(error_code)  # -- Status line: OK!
+        # -- Generating the response message
+        self.send_response(error_code)  # -- Status line: OK!
 
-            # Define the content-type header:
-            self.send_header('Content-Type', 'text/html')
-            self.send_header('Content-Length', len(str.encode(contents)))
-
-            # The header is finished
-            self.end_headers()
-
-            # Send the response message
-            self.wfile.write(str.encode(contents))
-            
-        else:
-            # -- Define the contents
-            contents = json.dumps(data)
-
-            # -- Generating the response message
-            self.send_response(error_code)  # -- Status line: OK!
-
+        if json_1:
             # Define the content-type header:
             self.send_header('Content-Type', 'application/json')
-            self.send_header('Content-Length', len(str.encode(contents)))
 
-            # The header is finished
-            self.end_headers()
+        else:
+            # Define the content-type header:
+            self.send_header('Content-Type', 'text/html')
 
-            # Send the response message
-            self.wfile.write(str.encode(contents))
+        self.send_header('Content-Length', len(str.encode(contents)))
+        # The header is finished
+        self.end_headers()
+        # Send the response message
+        self.wfile.write(str.encode(contents))
 
         return
 

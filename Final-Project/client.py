@@ -1,23 +1,16 @@
-import requests
+import http.client
 
-# -- API information
-HOSTNAME = "http://localhost:8000"
-ENDPOINTS = "/listSpecies?limit=10&json=1", "/listSpecies?json=1", "/karyotype?specie=mouse&json=1", \
-            "/chromosomeLength?specie=mouse&chromo=18&json=1", "/geneSeq?gene=FRAT1&json=1", \
-            "/geneInfo?gene=FRAT1&json=1", "/geneCalc?gene=FRAT1&json=1", \
-            "/geneList?chromo=1&start=0&end=30000&json=1", "/listSpecies?limeit=10&json=1", \
-            "/listSpecies?limit=1e0&json=1", "/karyotype?speecie=mouese&json=1", \
-            "/chromosomeLength?specie=moeuse&chromo=18&json=1", "/geneSeq?gene=FReAT1&json=1", \
-            "/geneInfo?gene=FeRAT1&json=1", "/geneCalc?gene=FReAT1&json=1", \
-            "/geneList?chromo=1&start=0&end=300000&json=1", "/geneList?chromo=e&start=0&end=30000&json=1", \
-            "/geneList?chromo=1&start=30001&end=30000&json=1", "/geneList?chromo=1&start=10&end=500000000&json=1", \
-            "/geneList?chromo=1&start=2000000000000&end=2000000000001&json=1"
-headers = {'User-Agent': 'http-client'}
-for endpoint in ENDPOINTS:
-    url_link = HOSTNAME + endpoint
+PORT = 8000
+SERVER = 'localhost'
 
-    r = requests.get(url_link, headers={"Content-Type": "application/json"})
+print("\nConnecting to server: {}:{}\n".format(SERVER, PORT))
 
-    text_json = r.json()
+conn = http.client.HTTPConnection(SERVER, PORT)
 
-    print(text_json)
+# 7 TRY FOR JSON
+conn.request("GET", "/geneList?chromo=1&start=0&end=30000&json=1")
+r1 = conn.getresponse()
+print("Response received!: {} {}\n".format(r1.status, r1.reason))
+data1 = r1.read().decode("utf-8")
+response = json.loads(data1)
+print(response)

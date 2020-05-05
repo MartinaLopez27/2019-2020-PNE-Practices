@@ -64,6 +64,8 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
         termcolor.cprint(self.requestline, 'green')  # -- Print the request line
         parameters = self.get_arguments()
         error_code = 200
+        json_1 = False
+        data = ""
 
         if self.path == "/":
             contents = Path("index.html").read_text()
@@ -250,7 +252,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
 
                 seq_string = response['seq']
 
-                print("Sequence: " + seq_string)
                 s1 = Seq(seq_string)
                 total = len(seq_string)
                 perc_A = s1.perc('A')
@@ -296,34 +297,44 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
 
                 finish = int(end) - int(start)
 
-                contents = f'''<!DOCTYPE html>
-                                <html lang="en">
-                                <head>
-                                    <meta charset="UTF-8">
-                                    <title>GENE LIST OF CHROMOSOMES</title>
-                                </head>
-                                <body style ="background-color: palegoldenrod;">
-                                <body>
-                                    The gene list of chromosome number {chromosome}, that starts at number {start} and ends at number {end}:<br> '''
-                count = 0
-                for element in response:
-                    if 'feature_type' in element and element['feature_type'] == 'gene':
-                        contents = contents + '<li>' + element['external_name'] + '</li>'
-                        count = count + 1
-                        if count == finish:
-                            break
+                if json_1 in parameters:
+                    json_1 = True
+                    gene_list = []
+                    count = 0
+                    for element in response:
+                        if 'feature_type' in element and element['feature_type'] == 'gene':
+                            gene_list.append(element['external_name'])
+                            count = count + 1
+                            if count == finish:
+                                break
+                        dic = dict()
+                        dic['Gene'] = gene_list
+                        contents = json.dumps(dic)
 
-                contents = contents + '''<a href="/">Main page</a>
-                                                    </body>
-                                                    </html>'''
+                else:
+                    contents = f'''<!DOCTYPE html>
+                                    <html lang="en">
+                                    <head>
+                                        <meta charset="UTF-8">
+                                        <title>GENE LIST OF CHROMOSOMES</title>
+                                    </head>
+                                    <body style ="background-color: palegoldenrod;">
+                                    <body>
+                                        The gene list of chromosome number {chromosome}, starting at number {start} and ending at number {end} are:<br> '''
+                    count = 0
+                    for element in response:
+                        if 'feature_type' in element and element['feature_type'] == 'gene':
+                            contents = contents + '<li>' + element['external_name'] + '</li>'
+                            count = count + 1
+                            if count == finish:
+                                break
+
+                    contents = contents + '''<a href="/">Main page</a>
+                                                        </body>
+                                                        </html>'''
             except ValueError:
                 contents = Path('Error.html').read_text()
                 error_code = 404
-
-
-
-
-
 
         else:
             contents = Path('Error.html').read_text()
@@ -332,13 +343,17 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
         # -- Generating the response message
         self.send_response(error_code)  # -- Status line: OK!
 
-        # Define the content-type header:
-        self.send_header('Content-Type', 'text/html')
-        self.send_header('Content-Length', len(str.encode(contents)))
+        if json_1:
+            # Define the content-type header:
+            self.send_header('Content-Type', 'application/json')
 
+        else:
+            # Define the content-type header:
+            self.send_header('Content-Type', 'text/html')
+
+        self.send_header('Content-Length', len(str.encode(contents)))
         # The header is finished
         self.end_headers()
-
         # Send the response message
         self.wfile.write(str.encode(contents))
 
