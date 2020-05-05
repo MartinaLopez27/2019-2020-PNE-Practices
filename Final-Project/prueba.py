@@ -64,6 +64,8 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
         termcolor.cprint(self.requestline, 'green')  # -- Print the request line
         parameters = self.get_arguments()
         error_code = 200
+        json_1 = False
+        data = ""
 
         if self.path == "/":
             contents = Path("index.html").read_text()
@@ -319,27 +321,40 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                 contents = Path('Error.html').read_text()
                 error_code = 404
 
-
-
-
-
-
         else:
             contents = Path('Error.html').read_text()
             error_code = 404
 
-        # -- Generating the response message
-        self.send_response(error_code)  # -- Status line: OK!
+        if not json_1:
+            # -- Generating the response message
+            self.send_response(error_code)  # -- Status line: OK!
 
-        # Define the content-type header:
-        self.send_header('Content-Type', 'text/html')
-        self.send_header('Content-Length', len(str.encode(contents)))
+            # Define the content-type header:
+            self.send_header('Content-Type', 'text/html')
+            self.send_header('Content-Length', len(str.encode(contents)))
 
-        # The header is finished
-        self.end_headers()
+            # The header is finished
+            self.end_headers()
 
-        # Send the response message
-        self.wfile.write(str.encode(contents))
+            # Send the response message
+            self.wfile.write(str.encode(contents))
+            
+        else:
+            # -- Define the contents
+            contents = json.dumps(data)
+
+            # -- Generating the response message
+            self.send_response(error_code)  # -- Status line: OK!
+
+            # Define the content-type header:
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(str.encode(contents)))
+
+            # The header is finished
+            self.end_headers()
+
+            # Send the response message
+            self.wfile.write(str.encode(contents))
 
         return
 
