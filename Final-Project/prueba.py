@@ -64,8 +64,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
         termcolor.cprint(self.requestline, 'green')  # -- Print the request line
         parameters = self.get_arguments()
         error_code = 200
-        json_1 = False
-        data = ""
+        json_value = False
 
         if self.path == "/":
             contents = Path("index.html").read_text()
@@ -295,23 +294,22 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                 data1 = r1.read().decode("utf-8")
                 response = json.loads(data1)
 
-                finish = int(end) - int(start)
-
-                if json_1 in parameters:
-                    json_1 = True
+                if "json" in parameters:
+                    json_value = True
                     gene_list = []
-                    count = 0
+
                     for element in response:
-                        if 'feature_type' in element and element['feature_type'] == 'gene':
-                            gene_list.append(element['external_name'])
-                            count = count + 1
-                            if count == finish:
-                                break
-                        dic = dict()
-                        dic['Gene'] = gene_list
-                        contents = json.dumps(dic)
+                        if element['feature_type'] == "gene":
+                            gene_dic = dict()
+                            gene_dic['name'] = element['external_name']
+                            gene_dic['start'] = element['start']
+                            gene_dic['end'] = element['end']
+                            gene_list.append(gene_dic)
+
+                    contents = json.dumps(gene_list)
 
                 else:
+                    finish = int(end) - int(start)
                     contents = f'''<!DOCTYPE html>
                                     <html lang="en">
                                     <head>
@@ -340,10 +338,11 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
             contents = Path('Error.html').read_text()
             error_code = 404
 
+
         # -- Generating the response message
         self.send_response(error_code)  # -- Status line: OK!
 
-        if json_1:
+        if json_value:
             # Define the content-type header:
             self.send_header('Content-Type', 'application/json')
 
