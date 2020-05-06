@@ -25,7 +25,7 @@ def get_json(server, endpoint, parameters):  # -- Access information contained i
 
         if not r.ok:
             error = r.json()['error']
-            return {'There are not species with that name': error}
+            return {'error': error}
 
         try:
             length = r.json()['length']
@@ -77,30 +77,38 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
             try:
                 limit = int(parameters['limit'])
                 if 0 < limit <= 267:
-                    contents = f''' <!DOCTYPE html>
-                                    <html lang = "en">            
-                                    <head>
-                                        <meta charset="UTF-8">
-                                        <title>LIST OF SPECIES IN THE BROWSER</title>
-                                    </head>
-                                    <body style="background-color: paleturquoise;">
-                                    <body>
-                                     The total number of species in the ensembl is: {len(info_list)}<br>
-                                     The limit you have selected is: {limit}<br>
-                                     The name of the species are: <br>'''
 
-                    count = 0
-                    for element in info_list:
-                        contents = contents + f''' <ul class="a">
-                                                <li>{element["display_name"]}</li>
-                                                </ul> '''
-                        count = count + 1
-                        if count == limit:
-                            break
+                    if "json" in parameters:
+                        json_value = True
+                        
+                        list_species = info_list[1:limit + 1]
+                        contents = json.dumps(list_species)
 
-                    contents = contents + '''<a href="/">Main page</a>
-                                            </body>
-                                            </html>'''
+                    else:
+                        contents = f''' <!DOCTYPE html>
+                                        <html lang = "en">            
+                                        <head>
+                                            <meta charset="UTF-8">
+                                            <title>LIST OF SPECIES IN THE BROWSER</title>
+                                        </head>
+                                        <body style="background-color: paleturquoise;">
+                                        <body>
+                                         The total number of species in the ensembl is: {len(info_list)}<br>
+                                         The limit you have selected is: {limit}<br>
+                                         The name of the species are: <br>'''
+
+                        count = 0
+                        for element in info_list:
+                            contents = contents + f''' <ul class="a">
+                                                    <li>{element["display_name"]}</li>
+                                                    </ul> '''
+                            count = count + 1
+                            if count == limit:
+                                break
+
+                        contents = contents + '''<a href="/">Main page</a>
+                                                </body>
+                                                </html>'''
             except ValueError:
                 contents = Path('Error.html').read_text()
                 error_code = 404
@@ -109,27 +117,38 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
             endpoint = "/info/assembly/"
             info_list = get_json(server, endpoint, parameters)
 
-            contents = '''  <!DOCTYPE html>
-                            <html lang = "en">             
-                            <head>
-                                <meta charset="UTF-8">
-                                <title>KARYOTYPE INFORMATION OF A SPECIE</title>
-                            </head>
-                            <body style="background-color: paleturquoise;">
-                            <body>   
-                              The names of the chromosomes are:'''
+            if "json" in parameters:
+                json_value = True
 
-            for element in info_list:
-                contents = contents + '<li>' + element + '</li>'
+                contents = json.dumps(info_list)
 
-            contents = contents + '''<a href="/">Main page</a>
-                                        </body>
-                                        </html>'''
+            else:
+                contents = ''' <!DOCTYPE html>
+                                <html lang = "en">             
+                                <head>
+                                    <meta charset="UTF-8">
+                                    <title>KARYOTYPE INFORMATION OF A SPECIE</title>
+                                </head>
+                                <body style="background-color: paleturquoise;">
+                                <body>   
+                                  The names of the chromosomes are:'''
+
+                for element in info_list:
+                    contents = contents + '<li>' + element + '</li>'
+
+                contents = contents + '''<a href="/">Main page</a>
+                                            </body>
+                                            </html>'''
 
         elif "chromosomeLength" in self.path:
             endpoint = "/info/assembly/"
             info_list = get_json(server, endpoint, parameters)
             try:
+
+                if "json" in parameters:
+                    contents = json.dumps(info_list)
+
+                else:
                     contents = f''' <!DOCTYPE html>
                                     <html lang = "en">            
                                     <head>

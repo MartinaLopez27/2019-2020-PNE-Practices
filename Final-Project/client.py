@@ -28,3 +28,4 @@ data1 = r1.read().decode("utf-8")
 
 # -- Print the received data
 print(f"CONTENT: {data1}")
+
