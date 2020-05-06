@@ -22,6 +22,7 @@ def get_json(server, endpoint, parameters):  # -- Access information contained i
             chromo = ""
         url_link = server + endpoint + specie + "/" + chromo
         r = requests.get(url_link, headers={"Content-Type": "application/json"})
+
         if not r.ok:
             error = r.json()['error']
             return {'There are not species with that name': error}
@@ -64,8 +65,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
         termcolor.cprint(self.requestline, 'green')  # -- Print the request line
         parameters = self.get_arguments()
         error_code = 200
-        json_1 = False
-        data = ""
+        json_value = False
 
         if self.path == "/":
             contents = Path("index.html").read_text()
@@ -74,7 +74,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
         elif "listSpecies" in self.path:
             endpoint = "/info/species"
             info_list = get_json(server, endpoint, parameters)
-
             try:
                 limit = int(parameters['limit'])
                 if 0 < limit <= 267:
@@ -130,22 +129,21 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
         elif "chromosomeLength" in self.path:
             endpoint = "/info/assembly/"
             info_list = get_json(server, endpoint, parameters)
-
-            if 'length' in info_list.keys():
+            try:
                 contents = f''' <!DOCTYPE html>
-                                <html lang = "en">            
-                                <head>
-                                    <meta charset="UTF-8">
-                                    <title>CHROMOSOME LENGTH OF A SPECIE</title>
-                                </head>
-                                <body style="background-color: paleturquoise;">
-                                <body>
-                                    The length of the chromosome {parameters['chromo']} of the specie {parameters['specie']} is: {info_list['length']}<br>'''
+                                    <html lang = "en">            
+                                    <head>
+                                        <meta charset="UTF-8">
+                                        <title>CHROMOSOME LENGTH OF A SPECIE</title>
+                                    </head>
+                                    <body style="background-color: paleturquoise;">
+                                    <body>
+                                        The length of the chromosome {parameters['chromo']} of the specie {parameters['specie']} is: {info_list['length']}<br>'''
 
                 contents = contents + '''<a href="/">Main page</a>
-                                        </body>
-                                        </html>'''
-            else:
+                                            </body>
+                                            </html>'''
+            except KeyError:
                 contents = Path('Error.html').read_text()
                 error_code = 404
 
@@ -167,24 +165,29 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
 
                 DNA_sequence = response['seq']
 
-                # Dict = {}  #para el json
-                # Dict['DNAsequence'] = response['seq']
+                if "json" in parameters:
+                    json_value = True
 
-                contents = f'''<!DOCTYPE html>
-                                <html lang="en">
-                                <head>
-                                    <meta charset="UTF-8">
-                                    <title>SEQUENCE OF A HUMAN GENE</title>
-                                </head>
-                                <body style ="background-color: palegoldenrod;">
-                                <body>
-                                    The sequence of the human gene {gene_id} is:<br> '''
+                    gene_dic = dict()
+                    gene_dic['seq'] = DNA_sequence
+                    contents = json.dumps(gene_dic)
 
-                contents = contents + '<li>' + DNA_sequence + '<li>'
+                else:
+                    contents = f'''<!DOCTYPE html>
+                                    <html lang="en">
+                                    <head>
+                                        <meta charset="UTF-8">
+                                        <title>SEQUENCE OF A HUMAN GENE</title>
+                                    </head>
+                                    <body style ="background-color: palegoldenrod;">
+                                    <body>
+                                        The sequence of the human gene {gene_id} is:<br> '''
 
-                contents = contents + '''<a href="/">Main page</a>
-                                        </body>
-                                        </html>'''
+                    contents = contents + '<li>' + DNA_sequence + '<li>'
+
+                    contents = contents + '''<a href="/">Main page</a>
+                                            </body>
+                                            </html>'''
             except KeyError:
                 contents = Path('Error.html').read_text()
                 error_code = 404
@@ -205,31 +208,44 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                 data1 = r1.read().decode('utf-8')
                 response = json.loads(data1)
 
+                id = response[0]['id']
                 start = response[0]['start']
                 end = response[0]['end']
-                id = response[0]['id']
                 lenght = end - start
                 chromosome = response[0]['assembly_name']
 
-                contents = f'''<!DOCTYPE html>
-                                <html lang="en">
-                                <head>
-                                    <meta charset="UTF-8">
-                                    <title>INFORMATION OF A HUMAN GENE</title>
-                                </head>
-                                <body style ="background-color: palegoldenrod;">
-                                <body>
-                                    The information available about the gene {gene_id} is:<br>'''
+                if "json" in parameters:
+                    json_value = True
 
-                contents = contents + '<h4>The Id of the gene is:</h4><li>' + id + '</li>'
-                contents = contents + '<h4>The gene start on position:</h4><li>' + str(start) + '</li>'
-                contents = contents + '<h4>The gene ends on position:</h4><li>' + str(end) + '</li>'
-                contents = contents + '<h4>The length of the gene is:</h4><li>' + str(lenght) + '</li>'
-                contents = contents + '<h4>The gene is on chromosome:</h4><li>' + chromosome + '</li><br>'
+                    gene_dic = dict()
+                    gene_dic['id'] = id
+                    gene_dic['start'] = start
+                    gene_dic['end'] = end
+                    gene_dic['lenght'] = lenght
+                    gene_dic['chromosome'] = chromosome
 
-                contents = contents + '''<a href="/">Main page</a>
-                                                    </body>
-                                                    </html>'''
+                    contents = json.dumps(gene_dic)
+
+                else:
+                    contents = f'''<!DOCTYPE html>
+                                    <html lang="en">
+                                    <head>
+                                        <meta charset="UTF-8">
+                                        <title>INFORMATION OF A HUMAN GENE</title>
+                                    </head>
+                                    <body style ="background-color: palegoldenrod;">
+                                    <body>
+                                        The information available about the gene {gene_id} is:<br>'''
+
+                    contents = contents + '<h4>The Id of the gene is:</h4><li>' + id + '</li>'
+                    contents = contents + '<h4>The gene start on position:</h4><li>' + str(start) + '</li>'
+                    contents = contents + '<h4>The gene ends on position:</h4><li>' + str(end) + '</li>'
+                    contents = contents + '<h4>The length of the gene is:</h4><li>' + str(lenght) + '</li>'
+                    contents = contents + '<h4>The gene is on chromosome:</h4><li>' + chromosome + '</li><br>'
+
+                    contents = contents + '''<a href="/">Main page</a>
+                                                        </body>
+                                                        </html>'''
             except KeyError:
                 contents = Path('Error.html').read_text()
                 error_code = 404
@@ -259,25 +275,38 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                 perc_G = s1.perc('G')
                 perc_C = s1.perc('C')
 
-                contents = f'''<!DOCTYPE html>
-                                <html lang="en">
-                                <head>
-                                    <meta charset="UTF-8">
-                                    <title>CALCULATIONS OF A HUMAN GENE</title>
-                                </head>
-                                <body style ="background-color: palegoldenrod;">
-                                <body>
-                                    The calculations available about the gene {gene_id} are:<br>'''
+                if "json" in parameters:
+                    json_value = True
 
-                contents = contents + '<h4>The total lenght is:</h4><li>' + str(total) + '</li>'
-                contents = contents + '<h4>The percentage of base A is:</h4><li>' + str(perc_A) + '</li>'
-                contents = contents + '<h4>The percentage of base T is:</h4><li>' + str(perc_T) + '</li>'
-                contents = contents + '<h4>The percentage of base G is:</h4><li>' + str(perc_G) + '</li>'
-                contents = contents + '<h4>The percentage of base C is:</h4><li>' + str(perc_C) + '</li><br>'
+                    gene_dic = dict()
+                    gene_dic['lenght'] = total
+                    gene_dic['percA'] = perc_A
+                    gene_dic['percT'] = perc_T
+                    gene_dic['percG'] = perc_G
+                    gene_dic['percC'] = perc_C
 
-                contents = contents + '''<a href="/">Main page</a>
-                                                    </body>
-                                                    </html>'''
+                    contents = json.dumps(gene_dic)
+
+                else:
+                    contents = f'''<!DOCTYPE html>
+                                    <html lang="en">
+                                    <head>
+                                        <meta charset="UTF-8">
+                                        <title>CALCULATIONS OF A HUMAN GENE</title>
+                                    </head>
+                                    <body style ="background-color: palegoldenrod;">
+                                    <body>
+                                        The calculations available about the gene {gene_id} are:<br>'''
+
+                    contents = contents + '<h4>The total lenght is:</h4><li>' + str(total) + '</li>'
+                    contents = contents + '<h4>The percentage of base A is:</h4><li>' + str(perc_A) + '</li>'
+                    contents = contents + '<h4>The percentage of base T is:</h4><li>' + str(perc_T) + '</li>'
+                    contents = contents + '<h4>The percentage of base G is:</h4><li>' + str(perc_G) + '</li>'
+                    contents = contents + '<h4>The percentage of base C is:</h4><li>' + str(perc_C) + '</li><br>'
+
+                    contents = contents + '''<a href="/">Main page</a>
+                                                        </body>
+                                                        </html>'''
             except KeyError:
                 contents = Path('Error.html').read_text()
                 error_code = 404
@@ -297,41 +326,45 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
 
                 finish = int(end) - int(start)
 
-                if json_1 in parameters:
-                    json_1 = True
-                    gene_list = []
-                    count = 0
-                    for element in response:
-                        if 'feature_type' in element and element['feature_type'] == 'gene':
-                            gene_list.append(element['external_name'])
-                            count = count + 1
-                            if count == finish:
-                                break
-                        dic = dict()
-                        dic['Gene'] = gene_list
-                        contents = json.dumps(dic)
-
+                if 'error' in response:
+                    contents = Path('Error.html').read_text()
+                    error_code = 404
                 else:
-                    contents = f'''<!DOCTYPE html>
-                                    <html lang="en">
-                                    <head>
-                                        <meta charset="UTF-8">
-                                        <title>GENE LIST OF CHROMOSOMES</title>
-                                    </head>
-                                    <body style ="background-color: palegoldenrod;">
-                                    <body>
-                                        The gene list of chromosome number {chromosome}, starting at number {start} and ending at number {end} are:<br> '''
-                    count = 0
-                    for element in response:
-                        if 'feature_type' in element and element['feature_type'] == 'gene':
-                            contents = contents + '<li>' + element['external_name'] + '</li>'
-                            count = count + 1
-                            if count == finish:
-                                break
+                    if "json" in parameters:
+                        json_value = True
+                        gene_list = []
 
-                    contents = contents + '''<a href="/">Main page</a>
-                                                        </body>
-                                                        </html>'''
+                        for element in response:
+                            if element['feature_type'] == "gene":
+                                gene_dic = dict()
+                                gene_dic['name'] = element['external_name']
+                                gene_dic['start'] = element['start']
+                                gene_dic['end'] = element['end']
+                                gene_list.append(gene_dic)
+
+                        contents = json.dumps(gene_list)
+
+                    else:
+                        contents = f'''<!DOCTYPE html>
+                                        <html lang="en">
+                                        <head>
+                                            <meta charset="UTF-8">
+                                            <title>GENE LIST OF CHROMOSOMES</title>
+                                        </head>                   
+                                        <body style ="background-color: palegoldenrod;">
+                                        <body>
+                                            The gene list of chromosome number {chromosome}, starting at number {start} and ending at number {end} are:<br> '''
+                        count = 0
+                        for element in response:
+                            if 'feature_type' in element and element['feature_type'] == 'gene':
+                                contents = contents + '<li>' + element['external_name'] + '</li>'
+                                count = count + 1
+                                if count == finish:
+                                    break
+
+                        contents = contents + '''<a href="/">Main page</a>
+                                                            </body>
+                                                            </html>'''
             except ValueError:
                 contents = Path('Error.html').read_text()
                 error_code = 404
@@ -343,7 +376,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
         # -- Generating the response message
         self.send_response(error_code)  # -- Status line: OK!
 
-        if json_1:
+        if json_value:
             # Define the content-type header:
             self.send_header('Content-Type', 'application/json')
 
