@@ -1,5 +1,5 @@
-Test report - Martina López
-====================
+Test report - Martina López González
+======================================
 
 ---> Without any endpoint
 
@@ -8,63 +8,68 @@ Test report - Martina López
 
 * Output:
     <!DOCTYPE html>
-    <html lang="en" dir="ltr">
-      <head>
+    <head>
         <meta charset="utf-8">
         <title>FINAL PROJECT</title>
-      </head>
-      <body style="background-color: Lavender;">
-        <font face="cambria" size = 4 color = "black">
-
-          <h1>Browsing Human and Vertebrates genome</h1>
-          <h2>BASIC Level Services</h2><br>
+    </head>
+    <body style="background-color: Lavender;">
+    <font face="cambria" size = 4 color = "black">
+        <h1>Browsing Human and Vertebrates genome</h1>
+        <h2>BASIC Level Services</h2><br>
 
         <p>1)List of species in the genome database</p>
         <form action="/listSpecies" method="get">
-            </p>Limit: <input type="number" name="limit" min="1" max="267"></p>
+            <p>Limit: <input type="number" name="limit" min="1" max="267"></p>
+            <p>Select to retrieve json: <input type="checkbox" name="json" value="1"></p>
             <p><button type="submit">Send</button></p><br>
         </form>
 
         <p>2)Information about the karyotype:</p>
         <form action="/karyotype" method="get">
-            </p>Select the species: <input type="text" name="specie"></p>
+            <p>Select the species: <input type="text" name="specie"></p>
+            <p>Select to retrieve json: <input type="checkbox" name="json" value="1"></p>
             <p><button type="submit">Send</button></p><br>
-        </form>
+         </form>
 
-         <p>3)Chromosome Length</p>
+        <p>3)Chromosome Length</p>
         <form action="/chromosomeLength" method="get">
-            </p>Select the species: <input type="text" name="specie"></p>
-            </p>Select a chromosome: <input type="text" name="chromo"></p>
+            <p>Select the species: <input type="text" name="specie"></p>
+            <p>Select a chromosome: <input type="text" name="chromo"></p>
+            <p>Select to retrieve json: <input type="checkbox" name="json" value="1"></p>
             <p><button type="submit">Send</button></p><br>
         </form>
 
         <p>4)Sequence of a given human gene</p>
         <form action="/geneSeq" method="get">
             <p>Introduce the name of a gene: <input type="text" name="gene"></p>
+            <p>Select to retrieve json: <input type="checkbox" name="json" value="1"></p>
             <p><button type="submit">Send</button></p><br>
         </form>
 
         <p>5)Information about a human gene</p>
         <form action="/geneInfo" method="get">
             <p>Introduce the name of a gene: <input type="text" name="gene"></p>
+            <p>Select to retrieve json: <input type="checkbox" name="json" value="1"></p>
             <p><button type="submit">Send</button></p><br>
-        </form>
+         </form>
 
         <p>6)Calculations on the given human gene</p>
         <form action="/geneCalc" method="get">
             <p>Introduce the name of a gene: <input type="text" name="gene"></p>
+            <p>Select to retrieve json: <input type="checkbox" name="json" value="1"></p>
             <p><button type="submit">Send</button></p><br>
         </form>
 
         <p>7)Names of the genes located in the chromosome from the start to end positions</p>
         <form action="/geneList" method="get">
-            <p>Introduce the name of a chromosome: <input type="text" name="chromo"></p>
+            <p>Introduce the number of a chromosome: <input type="text" name="chromo"></p>
             <p>Introduce the start position: <input type="number" name="start" min="0"></p>
             <p>Introduce the end position: <input type="number" name="end" min="0"></p>
+            <p>Select to retrieve json: <input type="checkbox" name="json" value="1"></p>
             <p><button type="submit">Send</button></p><br>
         </form>
-      </body>
-    </html>
+    </font>
+    </body>
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -806,7 +811,9 @@ ______________________________________________________________________________
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 # --- ADVANCED LEVEL
--- We are going to test both services to see that they are still working and then with the json parameter activated.
+-- We are going to test both services to see that they are still working and then, with the json parameter activated.
+-- In case the user does not specify any data (or if it´s incorrect) with the json parameter activated,
+    the error html page will appear, as it happens in the basic and medium services.
 
 ---> listSpecies endpoint
 
@@ -1034,3 +1041,4 @@ _________________________________________________________________________
 
 * Output:
     [{"name": "FAM110C", "start": 38814, "end": 46870}, {"name": "AC079779.1", "start": 197569, "end": 209892}, {"name": "SH3YL1", "start": 217730, "end": 266398}, {"name": "ACP1", "start": 264140, "end": 278283}, {"name": "ALKAL2", "start": 279558, "end": 288851}, {"name": "AC079779.2", "start": 286419, "end": 301515}, {"name": "AC079779.3", "start": 290941, "end": 314373}, {"name": "AC079779.4", "start": 307683, "end": 309424}, {"name": "LINC01865", "start": 317912, "end": 342118}, {"name": "AC105393.2", "start": 388412, "end": 416885}, {"name": "AC105393.1", "start": 421057, "end": 424059}, {"name": "LINC01874", "start": 490944, "end": 503905}, {"name": "AC093326.2", "start": 495731, "end": 496633}, {"name": "LINC01875", "start": 545805, "end": 546667}, {"name": "AC093326.1", "start": 558153, "end": 578145}]
+_________________________________________________________________________
