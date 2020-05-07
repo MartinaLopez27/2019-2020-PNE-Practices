@@ -299,10 +299,10 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
 
                     gene_dic = dict()
                     gene_dic['lenght'] = total
-                    gene_dic['percA'] = perc_A
-                    gene_dic['percT'] = perc_T
-                    gene_dic['percG'] = perc_G
-                    gene_dic['percC'] = perc_C
+                    gene_dic['percentage A'] = perc_A
+                    gene_dic['percentage T'] = perc_T
+                    gene_dic['percentage G'] = perc_G
+                    gene_dic['percentage C'] = perc_C
 
                     contents = json.dumps(gene_dic)
                     
