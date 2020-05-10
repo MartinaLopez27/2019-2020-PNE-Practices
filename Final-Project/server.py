@@ -25,14 +25,14 @@ def get_json(server, endpoint, parameters):  # -- Access information contained i
 
         if not r.ok:
             error = r.json()['error']
-            return {'There are not species with that name': error}
+            return {'error': error}
 
         try:
             length = r.json()['length']
             return {'length': length}
         except KeyError:
             data_karyotype = r.json()['karyotype']
-            return {'The karyotype of this specie is:': data_karyotype}
+            return data_karyotype
 
     else:
         r = requests.get(server + endpoint, headers={"Content-Type": "application/json"})
@@ -80,7 +80,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
 
                     if "json" in parameters:
                         json_value = True
-
+                        
                         list_species = info_list[1:limit + 1]
                         contents = json.dumps(list_species)
 
@@ -244,7 +244,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
                     gene_dic['chromosome'] = chromosome
 
                     contents = json.dumps(gene_dic)
-
+                
                 else:
                     contents = f'''<!DOCTYPE html>
                                     <html lang="en">
@@ -299,13 +299,13 @@ class TestHandler(http.server.BaseHTTPRequestHandler):  # -- Our class inheritat
 
                     gene_dic = dict()
                     gene_dic['lenght'] = total
-                    gene_dic['percA'] = perc_A
-                    gene_dic['percT'] = perc_T
-                    gene_dic['percG'] = perc_G
-                    gene_dic['percC'] = perc_C
+                    gene_dic['percentage A'] = perc_A
+                    gene_dic['percentage T'] = perc_T
+                    gene_dic['percentage G'] = perc_G
+                    gene_dic['percentage C'] = perc_C
 
                     contents = json.dumps(gene_dic)
-
+                    
                 else:
                     contents = f'''<!DOCTYPE html>
                                     <html lang="en">
