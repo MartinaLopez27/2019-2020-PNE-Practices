@@ -25,4 +25,3 @@ for element in endpoints:
     data1 = r1.read().decode("utf-8")  # -- Read the response's body
 
     print(f"CONTENT: {data1}")  # -- Print the received data
-
