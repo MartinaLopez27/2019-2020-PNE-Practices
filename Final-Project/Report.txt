@@ -1,4 +1,5 @@
 Test report - Martina López González
+Basic, medium and advance reports
 ======================================
 
 ---> Without any endpoint
