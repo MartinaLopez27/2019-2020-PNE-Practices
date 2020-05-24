@@ -711,7 +711,7 @@ ___________________________________________________________________________
     </html>
 
 
-# TEST 5: ###  (The user didn´t introduce any parameter, so the error page is returned)
+### TEST 5: ###  (The user didn´t introduce any parameter, so the error page is returned)
 
 * Input:
     http://localhost:8080/geneList?chromo=&start=&end=
@@ -736,7 +736,7 @@ ______________________________________________________________________________
 
 ---> listSpecies endpoint
 
-### TEST 1: ###  (List species with limit 3)
+### TEST 1: ###  (List species with limit 4)
 
 * Input:
     http://localhost:8080/listSpecies?limit=4
@@ -820,7 +820,7 @@ ______________________________________________________________________________
 ### TEST 1: ###  (List species with limit 5)
 
 * Input:
-    http://localhost:8080/listSpecies?limit=3
+    http://localhost:8080/listSpecies?limit=5
 
 * Output:
     <!DOCTYPE html>
@@ -855,7 +855,62 @@ ______________________________________________________________________________
 
 * Output:
     [{"division": "EnsemblVertebrates", "release": 100, "assembly": "OchPri2.0-Ens", "strain_collection": null, "aliases": ["9978", "opri", "ochotona princeps", "ochpri", "american pika", "oprinceps", "pika"], "display_name": "Pika", "common_name": "American pika", "name": "ochotona_princeps", "strain": null, "accession": null, "groups": ["core"], "taxon_id": "9978"}, {"aliases": [], "strain_collection": null, "release": 100, "assembly": "ASM69896v1", "division": "EnsemblVertebrates", "display_name": "African ostrich", "common_name": "African ostrich", "accession": "GCA_000698965.1", "strain": null, "name": "struthio_camelus_australis", "taxon_id": "441894", "groups": ["otherfeatures", "rnaseq", "core"]}, {"name": "oreochromis_niloticus", "strain": null, "accession": "GCA_001858045.3", "groups": ["otherfeatures", "rnaseq", "core"], "taxon_id": "8128", "division": "EnsemblVertebrates", "assembly": "O_niloticus_UMD_NMBU", "release": 100, "aliases": [], "strain_collection": null, "display_name": "Nile tilapia", "common_name": "Nile tilapia"}, {"taxon_id": "7998", "groups": ["core", "funcgen", "rnaseq", "otherfeatures"], "strain": null, "name": "ictalurus_punctatus", "accession": "GCA_001660625.1", "common_name": "channel catfish", "display_name": "Channel catfish", "release": 100, "assembly": "IpCoco_1.2", "division": "EnsemblVertebrates", "strain_collection": null, "aliases": []}, {"release": 100, "assembly": "Pelusios_castaneus-1.0", "division": "EnsemblVertebrates", "strain_collection": null, "aliases": [], "common_name": "West African mud turtle", "display_name": "West African mud turtle", "strain": null, "name": "pelusios_castaneus", "accession": "GCA_007922175.1", "taxon_id": "367368", "groups": ["core", "rnaseq"]}]
-____________________________________________________________________________
+
+
+### TEST 3: ###  (List species with limit 2)
+
+* Input:
+    http://localhost:8080/listSpecies?limit=2
+
+* Output:
+    <!DOCTYPE html>
+    <html lang = "en">
+    <head>
+        <meta charset="UTF-8">
+        <title>LIST OF SPECIES IN THE BROWSER</title>
+    </head>
+    <body style="background-color: paleturquoise;">
+    <body>
+         The total number of species in the ensembl is: 286<br>
+         The limit you have selected is: 2<br>
+         The name of the species are: <br> <ul class="a">
+            <li>Pig - Rongchang</li>
+            </ul>  <ul class="a">
+            <li>Pika</li></ul>
+    <a href="/">Main page</a>
+    </body>
+    </html>
+
+
+### TEST 4: ###  (List species with limit 2 and json = 1)
+
+* Input:
+    http://localhost:8080/listSpecies?limit=2&json=1
+
+* Output:
+    [{"common_name": "birds", "display_name": "Chilean tinamou", "name": "nothoprocta_perdicaria", "strain_collection": null, "aliases": [], "release": 100, "assembly": "notPer1", "division": "EnsemblVertebrates", "groups": ["otherfeatures", "core"], "taxon_id": "30464", "strain": null, "accession": "GCA_003342845.1"}, {"assembly": "VulVul2.2", "release": 100, "aliases": ["fox", "silver fox"], "strain_collection": null, "division": "EnsemblVertebrates", "display_name": "Red fox", "name": "vulpes_vulpes", "common_name": "red fox", "accession": "GCA_003160815.1", "groups": ["otherfeatures", "rnaseq", "core"], "strain": null, "taxon_id": "9627"}]
+
+
+### TEST 5: ###  (The user didn´t introduce any parameter, so the error page is returned)
+
+* Input:
+    http://localhost:8080/listSpecies?limit=&json=1
+
+* Output:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>ERROR</title>
+    </head>
+    <body style="background-color: red;">
+        <h1>ERROR</h1>
+        <p>Resource not available</p>
+        <p>The data you have entered does not exist in the ensembl<p>
+        <p>Try again!</p>
+    </body>
+    </html>
+___________________________________________________________________________
 
 ---> karyotype endpoint
 
@@ -886,7 +941,57 @@ ____________________________________________________________________________
 
 * Output:
     ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "X", "Y", "MT"]
-______________________________________________________________________________
+
+
+### TEST 3: ###  (Karyotype infromation of the specie: cat)
+
+* Input:
+    http://localhost:8080/karyotype?specie=cat
+
+* Output:
+    <!DOCTYPE html>
+    <html lang = "en">
+    <head>
+        <meta charset="UTF-8">
+        <title>KARYOTYPE INFORMATION OF A SPECIE</title>
+    </head>
+    <body style="background-color: paleturquoise;">
+    <body>
+      The names of the chromosomes are:<li>A1</li><li>A2</li><li>A3</li><li>B1</li><li>B2</li><li>B3</li><li>B4</li><li>C1</li><li>C2</li><li>D1</li><li>D2</li><li>D3</li><li>D4</li><li>E1</li><li>E2</li><li>E3</li><li>F1</li><li>F2</li><li>X</li><li>MT</li>
+    <a href="/">Main page</a>
+    </body>
+    </html>
+
+
+### TEST 4: ###  (Karyotype infromation of the specie: cat and json = 1)
+
+* Input:
+    http://localhost:8080/karyotype?specie=cat&json=1
+    
+* Output:
+    ["A1", "A2", "A3", "B1", "B2", "B3", "B4", "C1", "C2", "D1", "D2", "D3", "D4", "E1", "E2", "E3", "F1", "F2", "X", "MT"]
+
+
+### TEST 5: ###  (The user didn´t introduce any parameter, so the error page is returned)
+
+* Input:
+    http://localhost:8080/listSpecies?limit=&json=1
+
+* Output:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>ERROR</title>
+    </head>
+    <body style="background-color: red;">
+        <h1>ERROR</h1>
+        <p>Resource not available</p>
+        <p>The data you have entered does not exist in the ensembl<p>
+        <p>Try again!</p>
+    </body>
+    </html>
+_____________________________________________________________________________
 
 ---> chromosomeLength endpoint
 
@@ -917,6 +1022,56 @@ ______________________________________________________________________________
 
 * Output:
     {"length": 171471747}
+
+
+### TEST 3: ###  (Chromosome length of the 4 chromosome of the specie horse)
+
+* Input:
+    http://localhost:8080/chromosomeLength?specie=horse&chromo=4
+
+* Output:
+    <!DOCTYPE html>
+    <html lang = "en">
+    <head>
+        <meta charset="UTF-8">
+        <title>CHROMOSOME LENGTH OF A SPECIE</title>
+    </head>
+    <body style="background-color: paleturquoise;">
+    <body>
+        The length of the chromosome 4 of the specie horse is: 109462549<br>
+    <a href="/">Main page</a>
+    </body>
+    </html>
+
+
+### TEST 4: ###  (Chromosome length of the 4 chromosome of the specie horse and json = 1)
+
+* Input:
+    http://localhost:8080/chromosomeLength?specie=horse&chromo=4&json=1
+
+* Output:
+    {"length": 109462549}
+
+
+### TEST 5: ###  (The user didn´t introduce any parameter, so the error page is returned)
+
+* Input:
+    http://localhost:8080/chromosomeLength?specie=&chromo=&json=1
+
+* Output:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>ERROR</title>
+    </head>
+    <body style="background-color: red;">
+        <h1>ERROR</h1>
+        <p>Resource not available</p>
+        <p>The data you have entered does not exist in the ensembl<p>
+        <p>Try again!</p>
+    </body>
+    </html>
 ______________________________________________________________________________
 
 ---> geneSeq endpoint
@@ -948,6 +1103,56 @@ ______________________________________________________________________________
 
 * Output:
     {"seq": "ATACCATTCTCTGTCTCATGGGGCGTCCTCCTGCTGGCAGGCCTGTGCTGCCTGGTCCCCAGCTCCCTGGTTGAGGATCCCCAGGAAGATGCTGCCCAAAAGACGGATACATCCCACCATGATCAAGGGGACTGGGAGGACCTTGCTTGCCAGAAGATCTCCTATAACGTCACCGACCTCGCCTTTGATTTGTACAAAGAGCTGGCTGATCTATCACAAACCAGCAATGTCTTAGTCACCCCAACAAGCGTGGCTATGGCCTTTGCAATGCTCTCCCTGGGGACCAAGGCTGACACTCGCACAGAGATCCTGGAAGGCCTGAATGTCAACCTCACAGAGACGCCTGAGGCCAAGATCCACGAATGCTTCCAGCAAGTTCTCCAAGCCCTCAGCAGGCCAGACACCCGGCTCCAGCTGACCACCGGCAGTAGCCTGTTTGTTAACAAGAGTATGAAGCTAGTGGACACGTTTTTGGAGGATACCAAGAAGCTGTACCACTCAGAAGCCTCTTCCATCAACTTCAGGGACACCGAGGAGGCCAAAGAGCAGATCAACAATTATGTGGAGAAAAGAACTGGAAGAAAAGTAGTGGATTTGGTCAAACACCTGAAAAAAGACACAAGTCTTGCCCTGGTGGATTACATTTCCTTTCACGGTAAGGTAGCACTACCTGTCCAAGCCCGTTCCACTGAAATAATCCAAACATATTCTCAAATTACTAGTTCTTAAGCTTTCCTAGACAATGTACTATGAGATATGGCAGGGCATTTAACATGGATTCTGCAATTTTCCAAACACAAACAATAAAATACTTTCCATGATCAAACAAGATTGAAGAATGATGAGTTTAAGACAGCCAAACCATCATCTTCTCTACAGACCTTGTCAGAGCCTTTATTGTCCTAATACTCATTGGAAATCCCTAATAGGGAGGGGGCAGAATATGAAATGCTTCCCACATGCTAAAGCCAGAAAAATATTTTGTGGCACATGCATAAAGGAATAGTTTCATGGAACATACTTTAGACGACCCTAGTGTCCCAGAAGCAGTGTCAGCTTTGCCGTCTAAAATATTGGGGTTCAAATCCTGCCTCTACCACTTACTAGCTTTTGATAAAGGACAATGCATTCTACCTCTCTGAGGTGCTAATTTCCCGTCTTAGCATGGACAAAATAGCATCCTTGCTGTCAGGTTGTTTTAAGGATTAAACAAGTGACAGATACCATGGGGATGGTGTGTGGCATACAGCAGGTGATGGACTCTTCTGTATCTCAGGCTGCCTTCCTGCCCCTGAGGGGTTAAAATGCCAGGGTGCTGGGGGCCCCAGGGCATTCTAAGCCAGCTCCTATTGTCCCAGGAAAACAGCATAGGGGAGGGGAGGTGGAGGCAAGGCCAGGGGCTGCTTCCTCCACTCTGAGGCTCCCTTGCTCTTGAGGCAAAGGAGGGCAGTGGAGAGCAGCCAGGCTGCAGTCAGCACAGCTGAGGTCCGGGCTCTGCTGTGGCCTTAGGGCAGGCCCAGGCCCCTCTCCAGCCCCCGTCTCCTCCTTCTGTCCAATGAGAAAGCTGAGCTCAAGGGTCCCTGAGGCACCTGCCCACTTGGCATGCCTCGATGGTGAAGCTTTCTTGGTACGGCAGAGGGGAGTCTGCCTAGGCATCTGCATCTCCCCTGCTCATCCAGGGAAAGGCCTCAGGAGAAGTAAGCACAATGCTGTCCTCGTATCTCAACAGAACCAGCCCTCTGCATGAGATCAGAAGCCTCCAGCCAAAGGTGGCAAGGCATAAGGAGTTCCGATTTTACTCATTAACTTTCATTAACCATCCCCAAGCCGCTATCGAATAAACAGAGCCAAATATAAATGCTTCTTCTGTGGCACCAGGATTTTGCCAATTAGTTCAAGTATATAGAAACTCTGGATTCTTCTTTATCTTCAGGTGATTCTCACAAAAGCTCTCCAGCAGCCAGATAGTTCCATTTGAATCCCATTTTACAGATGATAAAGCTGAAGCAGAGGGAAGTGTCCTGCCAAAGGGGCTCAGGGCTCCTTTCATTCACACACTTCCACCCTTTTATCCCACACCTGGCTGATGCCCACCTTCCTTTTCTTCCAGGCAAGTGGAAAGATAAATTCAAGGCTGAGCGCATTATGGTAGAGGGCTTCCATGTGGATGATAAGACCATCATCAGAGTGCCTATGATAAACCACCTGGGTAGATTTGACATCCACCGGGACAGGGAGTTATCCAGCTGGGTGCTGGCACAGCACTATGTGGGGAACGCCACTGCCTTCTTCATCCTGCCCGATCCAAAGAAGATGTGGCAGTTGGAAGAAAAATTGACCTACAGCCACCTTGAAAATATCCAGAGAGCCTTTGACATAAGGTGAT"}
+
+
+### TEST 3: ###  (DNA sequence of the gene FRAT1)
+
+* Input:
+    http://localhost:8080/geneSeq?gene=FRAT1
+
+* Output:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>SEQUENCE OF A HUMAN GENE</title>
+    </head>
+    <body style ="background-color: palegoldenrod;">
+    <body>
+        The sequence of the human gene FRAT1 is:<br> <li>CGGCTCCCGCGGCTGCAGGCGCGCGGCTAGAGTGCCTGGCGGGCTCCGGCTTCCGCGTCCGCCCCGGCCCCGGTCCAGACTTAGTCTTCAGCTCCGCGCCCGCTCCGCCGCGGCCCACCGCGCCCGCCGGCAGCCGAGCCCCCAGCGACGCCCGCACAGCTCCGGGTGCCCAGACAGGGGGCCATGCCGTGCCGGAGGGAGGAGGAAGAGGAAGCCGGCGAGGAGGCGGAGGGGGAGGAAGAGGAGGAGGACAGCTTCCTCCTACTGCAGCAGTCAGTGGCGCTGGGCAGCTCGGGCGAGGTGGACCGGCTGGTGGCCCAGATCGGCGAGACGCTGCAGCTGGACGCGGCGCAGCACAGCCCGGCCTCGCCGTGCGGGCCCCCGGGGGCGCCGCTGCGGGCCCCGGGGCCCCTGGCTGCGGCGGTGCCGGCGGACAAGGCCAGGTCCCCGGCGGTGCCGCTGCTGCTGCCGCCCGCGTTGGCGGAGACTGTGGGCCCGGCGCCCCCTGGGGTCCTGCGCTGCGCCCTGGGGGACCGCGGCCGCGTGCGGGGCCGCGCTGCGCCCTACTGCGTGGCCGAGCTCGCCACAGGCCCCAGCGCGCTGTCCCCACTGCCCCCTCAGGCCGACCTTGATGGGCCTCCGGGAGCTGGCAAGCAGGGCATCCCGCAGCCGCTGTCGGGTCCGTGCCGGCGAGGATGGCTCCGGGGCGCCGCCGCCTCCCGCCGCCTGCAGCAGCGACGCGGGTCCCAACCAGAAACCCGCACAGGCGACGACGACCCGCACCGGCTTCTGCAGCAGCTAGTGCTCTCTGGAAACCTCATCAAGGAGGCCGTGCGAAGGCTTCATTCGCGACGGCTGCAGTTACGTGCAAAGCTTCCCCAACGCCCGCTCCTGGGACCTCTGTCGGCCCCGGTGCATGAACCCCCTTCGCCTCGCAGCCCTCGCGCGGCCTGCAGTGACCCTGGCGCCTCCGGGAGGGCGCAGCTCAGAACTGGCGACGGCGTTCTTGTGCCTGGCAGCTAACACGCCCGGGGTGGCCACAGCGCCAGCCTCAGACTGGAGGGCAAGGGGTTCCCTTGAGGGCTGCAGTTCTACTCAGGCTGGTGGAGAACTCTGGCTTTTGGAAGCGAGAGTAAAAAGCTAATGACGAGGAACCGAAAAATCGCGAGTGTTTCGCGGGTAACTGGGGTTGAGGGCCAAAATATTTGGAATGAAGGACTTTGGCCCTATTTAAGGCAGATTTTACAGAGCGCACCTCAAACGTACAAGTCAGTAGGACTCCTTATTTGGCGTGACCCGACCTGGCCGCGGAGCCTGCATTTCCTCGCAGCCTCTCAGTGCCCTCCAGCCCCGCGACCATGTGGCCACAATCCACGCTTCTCCGGATCGCGGTGCGCCGGAACCACGGAGGATGATGCCAGTTACTTGCTTTACCTTTTCAGGGCTGGCTCCTGATCCACTTTGGGGGAGGAGAACATGAGTAGATAATTTCAGGGTGCAGCCCAATCTGCCAGACTTAAAAAAACCATCTTGTGTCTTTGGAGGTGCTGCTTAATACCAAACATGCGGTGCCATGAAGGGACCCTTTGGGGGTTGAATAGGAGTTAACCCCTGCGCTCTCTTTGCAACTGTCTCTCTTCTCAGAGTGGTGGGGGAAGGCTGTACGACACGGGTGGGGAAAGGAGGTGGGGGCGGGGAGTATTGAATGGTGGTGGAAGGGTAGAGAGGCGCGGAGTGAACCCCACGCCCTGTCTAAAGTGTATTTTCAGAGCCGGCCCGCCTCTCCTCGGTTCAAGGTCACTGTTTCCTGGGCACGCACTGGGTTGCGGGACAGAGTAGCCAGGTTCTGCCGGTGCTCGGAGAAGAGCGCAGTGTTTTGCAAGTGCTGGAGTCTCCTGAGGACACGCGCGTCGCCGCCACCGCGGGTGTGGGAAAGCGCGGACGTGCTGGGCGGCTGTGCTTCGGTAGGCGACCACCGCCCCTGGCCGCGCTCCGGGCTTTCACGGAAACTCCCGAGACCGGGCCCTGGGTTCCTCCTCTCCTACTCGGCTCTGCAGTCCTACTCAAGCGGGTGGCTCTGGGATCCTGGGGGCCTGGGTTGGGGGCTAGGGAGACGCCATGTGATGGACACTCCAGGGACACACAGCCTAGCACAGCAGCTTATAATGGGCTCTCCGGGGCCATTTGCAATAACAGCTGCAATTCCCTGGATAGACGAGTTGATTTCCTCCCTCTGCCCCTCCCCCAGCCATGCCAGCTGGCCTTTGTAAGTGCAGGAAACCGAGTAGAAAATGTGACCCTCCAAATGGAGAAGCTGCAGGCTTTGCCATTGTGAACCATGGTGAAGTGCTTGGAACATACTGTTCACTCACTCTAAAGGCGCTGAGACTGTGCTGTTGTTCTCGTTTTTATAGTCAATGGCTTGTTCATCATCCAGATGTGGCTACTGACATATCTACACTTCGCACCGGAGTGTCTGGAATTGTGGCTATCCTGATTATAGGATTTTAACTTAACTGAAATGCCTGCTTTGAATAAATGTGTTGGGTTTTTTGTTTGGTTTTATTTTATACTTGCCATCAGTGAAAAAGATGTACAGAACACATTTCTCTGATCTCCATAAACATGAAAACACTTGAAATCTC<li>
+    <a href="/">Main page</a>
+    </body>
+    </html>
+
+
+### TEST 4: ###  (DNA sequence of the gene FRAT1 and json = 1)
+
+* Input:
+    http://localhost:8080/geneSeq?gene=FRAT1&json=1
+
+* Output:
+    {"seq": "CGGCTCCCGCGGCTGCAGGCGCGCGGCTAGAGTGCCTGGCGGGCTCCGGCTTCCGCGTCCGCCCCGGCCCCGGTCCAGACTTAGTCTTCAGCTCCGCGCCCGCTCCGCCGCGGCCCACCGCGCCCGCCGGCAGCCGAGCCCCCAGCGACGCCCGCACAGCTCCGGGTGCCCAGACAGGGGGCCATGCCGTGCCGGAGGGAGGAGGAAGAGGAAGCCGGCGAGGAGGCGGAGGGGGAGGAAGAGGAGGAGGACAGCTTCCTCCTACTGCAGCAGTCAGTGGCGCTGGGCAGCTCGGGCGAGGTGGACCGGCTGGTGGCCCAGATCGGCGAGACGCTGCAGCTGGACGCGGCGCAGCACAGCCCGGCCTCGCCGTGCGGGCCCCCGGGGGCGCCGCTGCGGGCCCCGGGGCCCCTGGCTGCGGCGGTGCCGGCGGACAAGGCCAGGTCCCCGGCGGTGCCGCTGCTGCTGCCGCCCGCGTTGGCGGAGACTGTGGGCCCGGCGCCCCCTGGGGTCCTGCGCTGCGCCCTGGGGGACCGCGGCCGCGTGCGGGGCCGCGCTGCGCCCTACTGCGTGGCCGAGCTCGCCACAGGCCCCAGCGCGCTGTCCCCACTGCCCCCTCAGGCCGACCTTGATGGGCCTCCGGGAGCTGGCAAGCAGGGCATCCCGCAGCCGCTGTCGGGTCCGTGCCGGCGAGGATGGCTCCGGGGCGCCGCCGCCTCCCGCCGCCTGCAGCAGCGACGCGGGTCCCAACCAGAAACCCGCACAGGCGACGACGACCCGCACCGGCTTCTGCAGCAGCTAGTGCTCTCTGGAAACCTCATCAAGGAGGCCGTGCGAAGGCTTCATTCGCGACGGCTGCAGTTACGTGCAAAGCTTCCCCAACGCCCGCTCCTGGGACCTCTGTCGGCCCCGGTGCATGAACCCCCTTCGCCTCGCAGCCCTCGCGCGGCCTGCAGTGACCCTGGCGCCTCCGGGAGGGCGCAGCTCAGAACTGGCGACGGCGTTCTTGTGCCTGGCAGCTAACACGCCCGGGGTGGCCACAGCGCCAGCCTCAGACTGGAGGGCAAGGGGTTCCCTTGAGGGCTGCAGTTCTACTCAGGCTGGTGGAGAACTCTGGCTTTTGGAAGCGAGAGTAAAAAGCTAATGACGAGGAACCGAAAAATCGCGAGTGTTTCGCGGGTAACTGGGGTTGAGGGCCAAAATATTTGGAATGAAGGACTTTGGCCCTATTTAAGGCAGATTTTACAGAGCGCACCTCAAACGTACAAGTCAGTAGGACTCCTTATTTGGCGTGACCCGACCTGGCCGCGGAGCCTGCATTTCCTCGCAGCCTCTCAGTGCCCTCCAGCCCCGCGACCATGTGGCCACAATCCACGCTTCTCCGGATCGCGGTGCGCCGGAACCACGGAGGATGATGCCAGTTACTTGCTTTACCTTTTCAGGGCTGGCTCCTGATCCACTTTGGGGGAGGAGAACATGAGTAGATAATTTCAGGGTGCAGCCCAATCTGCCAGACTTAAAAAAACCATCTTGTGTCTTTGGAGGTGCTGCTTAATACCAAACATGCGGTGCCATGAAGGGACCCTTTGGGGGTTGAATAGGAGTTAACCCCTGCGCTCTCTTTGCAACTGTCTCTCTTCTCAGAGTGGTGGGGGAAGGCTGTACGACACGGGTGGGGAAAGGAGGTGGGGGCGGGGAGTATTGAATGGTGGTGGAAGGGTAGAGAGGCGCGGAGTGAACCCCACGCCCTGTCTAAAGTGTATTTTCAGAGCCGGCCCGCCTCTCCTCGGTTCAAGGTCACTGTTTCCTGGGCACGCACTGGGTTGCGGGACAGAGTAGCCAGGTTCTGCCGGTGCTCGGAGAAGAGCGCAGTGTTTTGCAAGTGCTGGAGTCTCCTGAGGACACGCGCGTCGCCGCCACCGCGGGTGTGGGAAAGCGCGGACGTGCTGGGCGGCTGTGCTTCGGTAGGCGACCACCGCCCCTGGCCGCGCTCCGGGCTTTCACGGAAACTCCCGAGACCGGGCCCTGGGTTCCTCCTCTCCTACTCGGCTCTGCAGTCCTACTCAAGCGGGTGGCTCTGGGATCCTGGGGGCCTGGGTTGGGGGCTAGGGAGACGCCATGTGATGGACACTCCAGGGACACACAGCCTAGCACAGCAGCTTATAATGGGCTCTCCGGGGCCATTTGCAATAACAGCTGCAATTCCCTGGATAGACGAGTTGATTTCCTCCCTCTGCCCCTCCCCCAGCCATGCCAGCTGGCCTTTGTAAGTGCAGGAAACCGAGTAGAAAATGTGACCCTCCAAATGGAGAAGCTGCAGGCTTTGCCATTGTGAACCATGGTGAAGTGCTTGGAACATACTGTTCACTCACTCTAAAGGCGCTGAGACTGTGCTGTTGTTCTCGTTTTTATAGTCAATGGCTTGTTCATCATCCAGATGTGGCTACTGACATATCTACACTTCGCACCGGAGTGTCTGGAATTGTGGCTATCCTGATTATAGGATTTTAACTTAACTGAAATGCCTGCTTTGAATAAATGTGTTGGGTTTTTTGTTTGGTTTTATTTTATACTTGCCATCAGTGAAAAAGATGTACAGAACACATTTCTCTGATCTCCATAAACATGAAAACACTTGAAATCTC"}
+
+
+### TEST 5: ###  (The user didn´t introduce any valid gene name, so the error page is returned)
+
+* Input:
+    http://localhost:8080/geneSeq?gene=Faxts&json=1
+
+* Output:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>ERROR</title>
+    </head>
+    <body style="background-color: red;">
+        <h1>ERROR</h1>
+        <p>Resource not available</p>
+        <p>The data you have entered does not exist in the ensembl<p>
+        <p>Try again!</p>
+    </body>
+    </html>
 ______________________________________________________________________________
 
 ---> geneInfo endpoint
@@ -979,6 +1184,56 @@ ______________________________________________________________________________
 
 * Output:
     {"id": "ENSG00000232810", "start": 31575565, "end": 31578336, "lenght": 2771, "chromosome": "GRCh38"}
+
+
+### TEST 3: ###  (Information about the human gene FRAT2)
+
+* Input:
+    http://localhost:8080/geneInfo?gene=FRAT2
+
+* Output:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>INFORMATION OF A HUMAN GENE</title>
+    </head>
+    <body style ="background-color: palegoldenrod;">
+    <body>
+        The information available about the gene FRAT2 is:<br><h4>The Id of the gene is:</h4><li>ENSG00000181274</li><h4>The gene start on position:</h4><li>97332497</li><h4>The gene ends on position:</h4><li>97334729</li><h4>The length of the gene is:</h4><li>2232</li><h4>The gene is on chromosome:</h4><li>GRCh38</li><br>
+    <a href="/">Main page</a>
+    </body>
+    </html>
+
+
+### TEST 4: ###  (Information about the human gene FRAT2 and json = 1)
+
+* Input:
+    http://localhost:8080/geneInfo?gene=FRAT2&json=1
+
+* Output:
+    {"id": "ENSG00000181274", "start": 97332497, "end": 97334729, "lenght": 2232, "chromosome": "GRCh38"}
+
+
+### TEST 5: ###  (The user didn´t introduce any valid gene name, so the error page is returned)
+
+* Input:
+    http://localhost:8080/geneInfo?gene=FRAT2xxx&json=1
+
+* Output:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>ERROR</title>
+    </head>
+    <body style="background-color: red;">
+        <h1>ERROR</h1>
+        <p>Resource not available</p>
+        <p>The data you have entered does not exist in the ensembl<p>
+        <p>Try again!</p>
+    </body>
+    </html>
 ____________________________________________________________________________
 
 ---> geneCalc endpoint
@@ -1010,6 +1265,56 @@ ____________________________________________________________________________
 
 * Output:
     {"lenght": 3603, "percentage A": 18.5, "percentage T": 20.4, "percentage G": 31.4, "percentage C": 29.6}
+
+
+### TEST 3: ###  (Calculations about the human gene TNF)
+
+* Input:
+    http://localhost:8080/geneCalc?gene=TNF
+
+* Output:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>CALCULATIONS OF A HUMAN GENE</title>
+    </head>
+    <body style ="background-color: palegoldenrod;">
+    <body>
+        The calculations available about the gene TNF are:<br><h4>The total lenght is:</h4><li>2772</li><h4>The percentage of base A is:</h4><li>25.6</li><h4>The percentage of base T is:</h4><li>21.6</li><h4>The percentage of base G is:</h4><li>28.3</li><h4>The percentage of base C is:</h4><li>24.5</li><br>
+    <a href="/">Main page</a>
+    </body>
+    </html>
+
+
+### TEST 4: ###  (Calculations about the human gene TNF and json = 1)
+
+* Input:
+    http://localhost:8080/geneCalc?gene=TNF&json=1
+
+* Output:
+    {"lenght": 2772, "percentage A": 25.6, "percentage T": 21.6, "percentage G": 28.3, "percentage C": 24.5}
+
+
+### TEST 5: ###  (The user didn´t introduce any valid gene name, so the error page is returned)
+
+* Input:
+    http://localhost:8080/geneCalc?gene=TNFf23&json=1
+
+* Output:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>ERROR</title>
+    </head>
+    <body style="background-color: red;">
+        <h1>ERROR</h1>
+        <p>Resource not available</p>
+        <p>The data you have entered does not exist in the ensembl<p>
+        <p>Try again!</p>
+    </body>
+    </html>
 _________________________________________________________________________
 
 ---> geneList endpoint
@@ -1041,4 +1346,56 @@ _________________________________________________________________________
 
 * Output:
     [{"name": "FAM110C", "start": 38814, "end": 46870}, {"name": "AC079779.1", "start": 197569, "end": 209892}, {"name": "SH3YL1", "start": 217730, "end": 266398}, {"name": "ACP1", "start": 264140, "end": 278283}, {"name": "ALKAL2", "start": 279558, "end": 288851}, {"name": "AC079779.2", "start": 286419, "end": 301515}, {"name": "AC079779.3", "start": 290941, "end": 314373}, {"name": "AC079779.4", "start": 307683, "end": 309424}, {"name": "LINC01865", "start": 317912, "end": 342118}, {"name": "AC105393.2", "start": 388412, "end": 416885}, {"name": "AC105393.1", "start": 421057, "end": 424059}, {"name": "LINC01874", "start": 490944, "end": 503905}, {"name": "AC093326.2", "start": 495731, "end": 496633}, {"name": "LINC01875", "start": 545805, "end": 546667}, {"name": "AC093326.1", "start": 558153, "end": 578145}]
+
+
+### TEST 3: ###  (List of the genes located in the chromosome 4, starting at 100 and ending at 300000)
+
+* Input:
+    http://localhost:8080/geneList?chromo=4&start=100&end=300000
+
+* Output:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>GENE LIST OF CHROMOSOMES</title>
+    </head>
+    <body style ="background-color: palegoldenrod;">
+    <body>
+        The gene list of chromosome number 4, starting at number 100 and ending at number 300000 are:<br> <li>BNIP3P41</li><li>ZNF595</li><li>AC253576.1</li><li>ZNF718</li><li>AC253576.2</li><li>AC108475.1</li><li>ZNF876P</li><li>AC079140.3</li><li>AC079140.5</li><li>ZNF732</li>
+    <a href="/">Main page</a>
+    </body>
+    </html>
+
+
+### TEST 4: ###  (List of the genes located in the chromosome 4, starting at 100 and ending at 300000 and json = 1)
+
+* Input:
+    http://localhost:8080/geneList?chromo=4&start=100&end=300000&json=1
+
+* Output:
+    [{"name": "BNIP3P41", "start": 49096, "end": 50124}, {"name": "ZNF595", "start": 53286, "end": 88208}, {"name": "AC253576.1", "start": 105959, "end": 107114}, {"name": "ZNF718", "start": 124501, "end": 202303}, {"name": "AC253576.2", "start": 149738, "end": 150317}, {"name": "AC108475.1", "start": 201409, "end": 205009}, {"name": "ZNF876P", "start": 212610, "end": 255985}, {"name": "AC079140.3", "start": 268982, "end": 269531}, {"name": "AC079140.5", "start": 269866, "end": 270175}, {"name": "ZNF732", "start": 270675, "end": 305474}]
+
+
+### TEST 5: ###  (The user didn´t introduce any valid gene name, so the error page is returned)
+
+* Input:
+    http://localhost:8080/geneList?chromo=4ss&start=100&end=300000&json=1
+
+* Output:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>ERROR</title>
+    </head>
+    <body style="background-color: red;">
+        <h1>ERROR</h1>
+        <p>Resource not available</p>
+        <p>The data you have entered does not exist in the ensembl<p>
+        <p>Try again!</p>
+    </body>
+    </html>
 _________________________________________________________________________
+
+Total tests = 65
